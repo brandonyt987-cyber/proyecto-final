@@ -1,0 +1,418 @@
+/* =========================================
+   1. ESTILOS BASE Y LAYOUT GENERAL (NEXUS)
+========================================= */
+body {
+    display: block !important; 
+    margin: 0;
+    padding: 0;
+    background: #f0f2f7;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: hidden;
+}
+
+/* =========================================
+   2. SIDEBAR 
+========================================= */
+.sidebar {
+    width: 250px;
+    background: linear-gradient(180deg, #6A11CB, #2575FC);
+    color: white;
+    padding: 20px 0;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow-y: auto;
+    box-shadow: 0 0 15px rgba(0,0,0,0.25);
+    z-index: 1000;
+}
+
+.sidebar h3 {
+    text-align: center;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 1.2rem;
+    color: #ffffff;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    padding-bottom: 40px;
+}
+
+.sidebar ul li a {
+    display: block;
+    padding: 15px 20px;
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+    border-left: 4px solid transparent;
+    transition: 0.3s ease;
+}
+
+.sidebar ul li a:hover,
+.sidebar ul li.active a {
+    background: rgba(255,255,255,0.15);
+    border-left: 4px solid #00f6ff;
+    backdrop-filter: blur(4px);
+}
+
+/* LOGO ENCIMA DEL SIDEBAR */
+.sidebar-logo {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    margin-top: -10px;
+}
+
+.sidebar-logo img {
+    width: 100px; 
+    display: block;
+    margin: 10px auto;
+    mix-blend-mode: lighten;
+    background: transparent !important;
+}
+
+/* =========================================
+   3. CONTENIDO PRINCIPAL jojojo
+========================================= */
+.main-content {
+    margin-left: 250px;
+    width: calc(100% - 250px);
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* =========================================
+   4. HEADER TOP — CON RULO.PNG jsjss no hallé mas nombres y me dio flojera XDDD
+========================================= */
+.header-top {
+    background-color: #6A11CB; 
+    background-image: url('/img/rulo.png'); 
+    background-repeat: repeat; 
+    background-size: auto 100%; 
+    
+    padding: 10px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 120px; 
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    
+    position: sticky;
+    top: 0;
+    z-index: 900;
+}
+
+.header-image-container {
+    flex-grow: 1;
+    max-width: 100%; 
+    height: 100%;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.header-dashboard-image {
+    width: auto;
+    max-width: 100%;
+    max-height: 95%; 
+    object-fit: contain;
+}
+
+.user-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    min-width: 150px;
+}
+
+.user-info {
+    font-weight: 700;
+    color: #ffffff !important; 
+    margin-bottom: 5px;
+    font-size: 0.95rem;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* Botón Cerrar Sesión (Blanco con letras rojas) */
+.btn-logout {
+    background: white;
+    border: none;
+    border-radius: 50px;
+    color: #ff4d4d;
+    cursor: pointer;
+    padding: 8px 20px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    transition: 0.25s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-logout:hover {
+    background: #ff4d4d;
+    color: white;
+    box-shadow: 0 4px 10px rgba(255, 77, 77, 0.3);
+}
+
+.dashboard-area {
+    padding: 40px;
+    flex-grow: 1;
+}
+
+/* =========================================
+   5. TARJETAS (CARDS) — 3 POR FILA PA QUE SE VEA WAPETON
+========================================= */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr) !important; 
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.stat-card {
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    border-top: none; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, #6A11CB, #2575FC);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+
+.stat-card h4 {
+    margin: 0 0 15px 0;
+    color: #6c757d;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.stat-card .value {
+    margin: 0;
+    font-size: 3rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #333, #555);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* =========================================
+   6. TABLAS Y BOTONES ESTILO PÍLDORA
+========================================= */
+.actions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.btn-main {
+    padding: 12px 24px;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.btn-create {
+    background: linear-gradient(135deg, #6A11CB, #2575FC);
+}
+.btn-create:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(37, 117, 252, 0.3);
+}
+
+.table-container {
+    width: 100%;
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    overflow-x: auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.crud-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    white-space: nowrap;
+}
+
+.crud-table thead {
+    background: linear-gradient(90deg, #f8f9fa, #e9ecef);
+}
+
+.crud-table th {
+    padding: 18px;
+    text-align: left;
+    color: #495057;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.crud-table td {
+    padding: 18px;
+    border-bottom: 1px solid #f1f3f5;
+    color: #444;
+}
+
+.crud-table .center {
+    text-align: center;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.btn-table-action {
+    padding: 6px 14px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-size: 0.85em;
+    color: white !important;
+    font-weight: 700;
+    transition: 0.2s;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-edit { background: linear-gradient(135deg, #f09819, #edde5d); }
+.btn-edit:hover { transform: translateY(-2px); }
+
+.btn-delete { background: linear-gradient(135deg, #ff416c, #ff4b2b); }
+.btn-delete:hover { transform: translateY(-2px); }
+
+.badge-info {
+    background: rgba(37, 117, 252, 0.1);
+    color: #2575FC;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.85em;
+}
+
+/* =========================================
+   7. FORMULARIOS
+========================================= */
+.form-container {
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 50px;
+    box-sizing: border-box;
+    outline: none;
+    transition: 0.3s;
+    background: #f8f9fa;
+}
+
+.form-control:focus {
+    border-color: #6A11CB;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(106, 17, 203, 0.1);
+}
+
+textarea.form-control {
+    border-radius: 16px;
+    resize: none;
+    height: 100px;
+    overflow-y: auto;
+    font-family: inherit;
+}
+
+/* =========================================
+   8. MENSAJES DE ERROR Y OTROS 
+========================================= */
+
+/* Mensajes de error de validación en Formularios  */
+.error-message {
+    display: block;          
+    width: 100%;             
+    margin-top: 5px;         
+    margin-bottom: 5px;      
+    color: #e74c3c;          
+    font-size: 0.85rem;      
+    font-weight: 600;
+    line-height: 1.4;        
+}
+
+/* Botón Cancelar (Grisesito) */
+.btn-cancel {
+    background-color: #e2e8f0; 
+    color: #64748b !important; 
+    padding: 12px 28px;        
+    border-radius: 50px;       
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.btn-cancel:hover {
+    background-color: #cbd5e1; 
+    color: #334155 !important;
+    transform: translateY(-2px); 
+    text-decoration: none;
+}
+
+.stats-grid {
+             display: grid;
+             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+             gap: 20px;
+        }
+        .stat-card {
+             padding: 15px;
+             background: white;
+             border-radius: 8px;
+             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+             border-left: 5px solid transparent;
+        }
+        .stat-card h4 { margin-top: 0; font-size: 1em; color: #555; }
+        .stat-card .value { font-size: 2em; font-weight: bold; color: #0077c9; margin: 0; }

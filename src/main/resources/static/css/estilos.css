@@ -1,0 +1,110 @@
+/* ============================
+   ESTILOS DEL LOGIN (AISLADOS) : osea los solitos que se ven aparte 
+   ============================ */
+
+/* Solo aplica al login */
+.login-body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* Contenedor del formulario del login */
+.login-body .form-container {
+    width: 80%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Títulos */
+.login-body h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Campos de formulario del login */
+.login-body .form-group {
+    margin-bottom: 20px;
+}
+
+.login-body label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: bold;
+}
+
+.login-body input,
+.login-body select,
+.login-body textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+/* Botón del login */
+.login-body button {
+    width: 100%;
+    padding: 12px;
+    background-color: #007BFF;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.login-body button:hover {
+    background-color: #0056b3;
+}
+
+/* Alineación de mensajes */
+.login-body .form-message {
+    text-align: center;
+    margin-top: 10px;
+    color: red;
+    font-size: 14px;
+}
+
+
+
+/* ============================
+   ESTILOS GLOBALES DEL SISTEMA
+   (NO AFECTAN LOGIN) POR SI ACASOO
+   ============================ */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    margin: 0;
+}
+
+/* Evita que TODOS los formularios del dashboard se vean centrados o encimados */
+form {
+    display: block;
+    width: auto;
+}
+
+/* Evita que inputs se expandan a full width en otras páginas */
+input,
+select,
+textarea {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Evita que .form-container afecte otros formularios fuera del login */
+.form-container {
+    width: auto;
+    max-width: none;
+    margin: 0;
+}

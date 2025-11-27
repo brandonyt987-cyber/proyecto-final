@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Dashboard | Sistema Integral SENA</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" type="text/css" th:href="@{/css/estilos.css}" href="/css/estilos.css">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}" href="/css/dashboard.css">
+</head>
+<body>
+    
+    <div class="sidebar" th:fragment="sidebar">
+
+        <div class="sidebar-logo">
+            <img src="/img/logo-sena.png" alt="Logo SENA">
+        </div>
+        <h3>SENA | NEXUS </h3>
+        
+        <ul>
+            <li th:classappend="${request.requestURI == '/dashboard'} ? 'active'">
+                <a th:href="@{/dashboard}">Dashboard</a>
+            </li>
+            
+            <li sec:authorize="hasRole('ADMIN')" 
+                th:classappend="${request.requestURI.startsWith('/usuarios')} ? 'active'">
+                <a th:href="@{/usuarios}">Administrar Usuarios</a>
+            </li>
+
+            <li sec:authorize="hasRole('ADMIN') or hasAnyRole('PSICOLOGA', 'T_SOCIAL')" 
+                th:classappend="${request.requestURI.startsWith('/coordinaciones')} ? 'active'">
+                <a th:href="@{/coordinaciones}">Coordinaciones</a>
+            </li>
+            
+            <li sec:authorize="hasRole('ADMIN') or hasAnyRole('PSICOLOGA', 'T_SOCIAL')" 
+                th:classappend="${request.requestURI.startsWith('/instructores')} ? 'active'">
+                <a th:href="@{/instructores}">Instructores</a>
+            </li>
+            
+            <li sec:authorize="hasRole('ADMIN') or hasAnyRole('PSICOLOGA', 'T_SOCIAL')" 
+                th:classappend="${request.requestURI.startsWith('/voceros')} ? 'active'">
+                <a th:href="@{/voceros}">Voceros</a>
+            </li>
+
+            <li sec:authorize="hasRole('ADMIN') or hasAnyRole('PSICOLOGA', 'T_SOCIAL')"
+                th:classappend="${request.requestURI.startsWith('/fichas')} ? 'active'">
+                <a th:href="@{/fichas}">Gestión de Fichas</a>
+            </li>
+            
+            <li sec:authorize="hasRole('ADMIN') or hasAnyRole('PSICOLOGA', 'T_SOCIAL')"
+                th:classappend="${request.requestURI.startsWith('/aprendices')} ? 'active'">
+                <a th:href="@{/aprendices}">Aprendices</a>
+            </li>
+            
+            <li sec:authorize="hasRole('ADMIN') or hasAnyRole('PSICOLOGA', 'T_SOCIAL')"
+                th:classappend="${request.requestURI.startsWith('/comite')} ? 'active'">
+                <a th:href="@{/comite}">Comités de Evaluación</a>
+            </li>
+
+            <li sec:authorize="hasRole('ADMIN') or hasAnyRole('PSICOLOGA', 'T_SOCIAL')"
+                th:classappend="${request.requestURI.startsWith('/atencion')} ? 'active'">
+                <a th:href="@{/atencion}">Atención Individual</a>
+            </li>
+            
+            <li sec:authorize="hasRole('ADMIN') or hasAnyRole('PSICOLOGA', 'T_SOCIAL')"
+                th:classappend="${request.requestURI.startsWith('/talleres')} ? 'active'">
+                <a th:href="@{/talleres}">Talleres</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        
+        <header class="header-top" th:fragment="header-top">
+            <div class="header-image-container">
+                <img th:src="@{/img/dash.png}" alt="Bienestar al Aprendiz" class="header-dashboard-image" />
+            </div>
+            
+            <div class="user-controls">
+                <span class="user-info" sec:authentication="name">Usuario</span> 
+                <form th:action="@{/logout}" method="post" style="display:inline;">
+                    <button type="submit" class="btn-logout">Cerrar Sesión</button>
+                </form>
+            </div>
+        </header>
+
+        <div class="dashboard-area">
+            
+            <div sec:authorize="hasAnyRole('ADMIN', 'PSICOLOGA', 'T_SOCIAL')">
+                <h3>Métricas del Sistema</h3>
+                
+                <div class="stats-grid">
+                    
+                    <div class="stat-card" style="border-left: 5px solid #3498db;" sec:authorize="hasRole('ADMIN')"> 
+                        <h4>Total de Usuarios</h4>
+                        <p class="value" th:text="${totalUsuarios != null ? totalUsuarios : '0'}">0</p>
+                    </div>
+                    
+                    <div class="stat-card" style="border-left: 5px solid #3498db;">
+                        <h4>Fichas Creadas</h4>
+                        <p class="value" th:text="${totalFichas != null ? totalFichas : '0'}">0</p>
+                    </div>
+                    
+                    <div class="stat-card" style="border-left: 5px solid #3498db;">
+                        <h4>Aprendices</h4>
+                        <p class="value" th:text="${totalAprendices != null ? totalAprendices : '0'}">0</p>
+                    </div>
+
+                    <div class="stat-card" style="border-left: 5px solid #3498db;">
+                        <h4>Coordinaciones</h4>
+                        <p class="value" th:text="${totalCoordinaciones != null ? totalCoordinaciones : '0'}">0</p>
+                    </div>
+
+                    <div class="stat-card" style="border-left: 5px solid #3498db;">
+                        <h4>Instructores</h4>
+                        <p class="value" th:text="${totalInstructores != null ? totalInstructores : '0'}">0</p>
+                    </div>
+
+                    <div class="stat-card" style="border-left: 5px solid #3498db;">
+                        <h4>Voceros</h4>
+                        <p class="value" th:text="${totalVoceros != null ? totalVoceros : '0'}">0</p>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>

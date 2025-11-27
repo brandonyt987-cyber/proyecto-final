@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Atención Individual | SENA</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="icon" type="image/png" th:href="@{/img/logo-sena.png}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    
+    <style>
+        /* Ajuste para tabla ancha con scroll */
+        .table-container { overflow-x: auto; }
+        .crud-table { min-width: 1400px; }
+        
+        /* Estilo para textos secundarios */
+        .sub-text { display: block; font-size: 0.85em; color: #666; margin-top: 2px; }
+
+        /* Buscador uwu*/
+        .header-tools { display: flex; gap: 15px; align-items: center; }
+        .search-input {
+            padding: 10px 20px; border-radius: 50px; border: 1px solid #ccc;
+            outline: none; font-size: 0.9rem; width: 250px; transition: all 0.3s;
+        }
+        .search-input:focus { border-color: #6A11CB; box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1); }
+    </style>
+</head>
+<body>
+    
+    <div th:replace="~{dashboard :: sidebar}"></div>
+    
+    <div class="main-content">
+        <header th:replace="~{dashboard :: header-top}"></header>
+
+        <div class="dashboard-area">
+            
+            <div class="actions-header">
+                <h3>Atención Individual</h3>
+                
+                <div class="header-tools">
+                    <input type="text" id="searchInput" class="search-input" onkeyup="filtrarTabla()" placeholder="Buscar caso...">
+                    
+                    <a th:href="@{/atencion/crear}" class="btn-main btn-create">
+                        + Nueva Atención
+                    </a>
+                </div>
+            </div>
+
+            <div th:if="${exito}" style="margin-bottom: 20px; text-align: center; color: green; font-weight: bold;">
+                <span th:text="${exito}"></span>
+            </div>
+
+            <div class="table-container">
+                <table class="crud-table" id="tablaDatos">
+                    <thead>
+                        <tr>
+                            <th class="center" style="width:50px;">ID</th>
+                            <th>Aprendiz / Documento</th>
+                            <th>Ficha / Programa</th> 
+                            <th>Contacto</th> 
+                            <th>Categoría</th>
+                            <th>Profesional</th>
+                            <th class="center">Etapa Actual</th>
+                            <th class="center">Estado</th>
+                            <th class="center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="a : ${atenciones}">
+                            <td class="center" style="font-weight:bold;" th:text="${a.id}"></td>
+                            
+                            <td>
+                                <strong th:text="${a.aprendiz.nombreCompleto}"></strong>
+                                <span class="sub-text" th:text="${a.aprendiz.tipoDocumento} + ' ' + ${a.aprendiz.numeroDocumento}"></span>
+                            </td>
+                            
+                            <td>
+                                <span class="badge-info" th:text="${a.aprendiz.ficha?.codigo}"></span>
+                                <span class="sub-text" th:text="${#strings.abbreviate(a.aprendiz.ficha?.programa, 30)}"></span>
+                            </td>
+
+                            <td>
+                                <div style="font-size:0.9em;">
+                                    Cel: <span th:text="${a.aprendiz.celular}"></span><br>
+                                    Email: <span th:text="${a.aprendiz.correo}"></span>
+                                </div>
+                            </td>
+
+                            <td th:text="${a.categoriaDesercion}"></td>
+                            <td th:text="${a.profesional.nombre}"></td>
+                            
+                            <td class="center">
+                                <span th:if="${a.fechaConsulta3 != null}" style="background:#e8f5e9; color:#2e7d32; padding:3px 8px; border-radius:10px; font-size:0.85em; font-weight:bold;">3ª Cita</span>
+                                <span th:if="${a.fechaConsulta3 == null and a.fechaConsulta2 != null}" style="background:#f3e5f5; color:#7b1fa2; padding:3px 8px; border-radius:10px; font-size:0.85em; font-weight:bold;">2ª Cita</span>
+                                <span th:if="${a.fechaConsulta3 == null and a.fechaConsulta2 == null}" style="background:#e3f2fd; color:#0d47a1; padding:3px 8px; border-radius:10px; font-size:0.85em; font-weight:bold;">1ª Cita</span>
+                            </td>
+
+                            <td class="center">
+                                <span th:if="${a.estadoCaso == 'Abierto'}" style="color:green; font-weight:bold;">Abierto</span>
+                                <span th:if="${a.estadoCaso == 'Cerrado'}" style="color:gray; font-weight:bold;">Cerrado</span>
+                                <span th:if="${a.estadoCaso == 'En Seguimiento'}" style="color:orange; font-weight:bold;">Seguimiento</span>
+                            </td>
+                            
+                            <td class="center">
+                                <div class="action-buttons">
+                                    <a th:href="@{/atencion/editar/{id}(id=${a.id})}" class="btn-table-action btn-edit">Ver/Editar</a>
+                                    
+                                    <a th:href="@{/atencion/eliminar/{id}(id=${a.id})}" 
+                                       class="btn-table-action btn-delete" 
+                                       onclick="return confirm('¿Eliminar registro?')">Eliminar</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr id="noResults" style="display:none;">
+                            <td colspan="9" style="text-align:center; padding: 20px; color: #666;">No se encontraron resultados.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div th:if="${#lists.isEmpty(atenciones)}" style="text-align:center; padding:30px; color:#666;">
+                No hay casos registrados.
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function filtrarTabla() {
+            var input, filter, table, tr, td, i, j, visible;
+            input = document.getElementById("searchInput");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("tablaDatos");
+            tr = table.getElementsByTagName("tr");
+            var noResults = document.getElementById("noResults");
+            var hayResultados = false;
+
+            for (i = 1; i < tr.length; i++) {
+                if (tr[i].id === "noResults") continue;
+                visible = false;
+                td = tr[i].getElementsByTagName("td");
+                for (j = 0; j < td.length; j++) {
+                    if (td[j] && td[j].textContent.toUpperCase().indexOf(filter) > -1) {
+                        visible = true;
+                        break;
+                    }
+                }
+                if (visible) {
+                    tr[i].style.display = "";
+                    hayResultados = true;
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+            
+            if (!hayResultados && filter !== "") {
+                noResults.style.display = "table-row";
+            } else {
+                noResults.style.display = "none";
+            }
+        }
+    </script>
+
+</body>
+</html>

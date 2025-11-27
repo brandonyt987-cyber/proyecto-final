@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Gestión de Instructores</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="icon" type="image/png" th:href="@{/img/logo-sena.png}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    
+    <style>
+        /* Estilo para el buscador */
+        .header-tools {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .search-input {
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 1px solid #ccc;
+            outline: none;
+            font-size: 0.9rem;
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+        .search-input:focus {
+            border-color: #6A11CB;
+            box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1);
+        }
+    </style>
+</head>
+<body>
+    
+    <div th:replace="~{dashboard :: sidebar}"></div>
+    
+    <div class="main-content">
+        <header th:replace="~{dashboard :: header-top}"></header>
+
+        <div class="dashboard-area">
+            
+            <div class="actions-header">
+                <h3>Instructores</h3>
+                
+                <div class="header-tools">
+                    <input type="text" id="searchInput" class="search-input" onkeyup="filtrarTabla()" placeholder="Buscar instructor...">
+                    
+                    <a sec:authorize="hasRole('ADMIN')" 
+                       th:href="@{/instructores/crear}" 
+                       class="btn-main btn-create">
+                        + Nuevo Instructor
+                    </a>
+                </div>
+            </div>
+
+            <div th:if="${exito}" style="margin-bottom: 20px; text-align: center; color: green; font-weight: bold;">
+                <span th:text="${exito}"></span>
+            </div>
+            <div th:if="${error}" style="margin-bottom: 20px; text-align: center; color: red; font-weight: bold;">
+                <span th:text="${error}"></span>
+            </div>
+
+            <div class="table-container">
+                <table class="crud-table" id="tablaDatos">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px; text-align: center;">ID</th>
+                            <th>Documento</th>
+                            <th>Nombre Completo</th>
+                            <th>Profesión</th>
+                            <th>Coordinación</th>
+                            <th>Teléfono</th>
+                            <th>Correo</th>
+                            <th sec:authorize="hasRole('ADMIN')" class="center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="i : ${instructores}">
+                            <td style="text-align: center; font-weight: bold;" th:text="${i.id}"></td>
+                            <td th:text="${i.numeroDocumento}"></td>
+                            <td th:text="${i.nombreCompleto}"></td>
+                            <td th:text="${i.profesion}"></td>
+                            
+                            <td>
+                                <span class="badge-info" th:text="${i.coordinacion.nombre}"></span>
+                            </td>
+                            
+                            <td th:text="${i.telefono}"></td>
+                            <td th:text="${i.correo}"></td>
+
+                            <td sec:authorize="hasRole('ADMIN')" class="center">
+                                <div class="action-buttons">
+                                    <a th:href="@{/instructores/editar/{id}(id=${i.id})}" 
+                                       class="btn-table-action btn-edit">Editar</a>
+                                    <a th:href="@{/instructores/eliminar/{id}(id=${i.id})}" 
+                                       class="btn-table-action btn-delete"
+                                       onclick="return confirm('¿Eliminar instructor?')">Eliminar</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr id="noResults" style="display:none;">
+                            <td colspan="8" style="text-align:center; padding: 20px; color: #666;">No se encontraron resultados.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function filtrarTabla() {
+            var input, filter, table, tr, td, i, j, visible;
+            input = document.getElementById("searchInput");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("tablaDatos");
+            tr = table.getElementsByTagName("tr");
+            var noResults = document.getElementById("noResults");
+            var hayResultados = false;
+
+            for (i = 1; i < tr.length; i++) {
+                if (tr[i].id === "noResults") continue;
+                visible = false;
+                td = tr[i].getElementsByTagName("td");
+                for (j = 0; j < td.length; j++) {
+                    if (td[j] && td[j].textContent.toUpperCase().indexOf(filter) > -1) {
+                        visible = true;
+                        break;
+                    }
+                }
+                if (visible) {
+                    tr[i].style.display = "";
+                    hayResultados = true;
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+            
+            if (!hayResultados && filter !== "") {
+                noResults.style.display = "table-row";
+            } else {
+                noResults.style.display = "none";
+            }
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Nueva Ficha | SENA</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="icon" type="image/png" th:href="@{/img/logo-sena.png}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+    
+    <div th:replace="~{dashboard :: sidebar}"></div>
+    
+    <div class="main-content">
+        <header th:replace="~{dashboard :: header-top}"></header>
+
+        <div class="dashboard-area">
+            
+            <h3 style="text-align: center; margin-bottom: 25px;">Registrar Nueva Ficha</h3>
+
+            <div class="form-container" style="max-width: 600px; margin: 0 auto;">
+                
+                <div th:if="${error}" style="background: #fee2e2; color: #991b1b; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: bold;">
+                    <span th:text="${error}"></span>
+                </div>
+
+                <form method="POST" th:action="@{/fichas/guardar}" th:object="${ficha}" novalidate>
+                    
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Código de Ficha</label>
+                        <input type="text" th:field="*{codigo}" class="form-control" placeholder="Solo números (Min 5 Máx 12)"
+                               minlength="5" maxlength="12"
+                               oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+                        <span th:if="${#fields.hasErrors('codigo')}" th:errors="*{codigo}" class="error-message"></span>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Programa de Formación</label>
+                        <input type="text" th:field="*{programa}" class="form-control" placeholder="Ej: Análisis y Desarrollo de Software"
+                               minlength="5" maxlength="100"
+                               oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '')" required>
+                        <span th:if="${#fields.hasErrors('programa')}" th:errors="*{programa}" class="error-message"></span>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Jornada</label>
+                        <select th:field="*{jornada}" class="form-control" required>
+                            <option value="">-- Seleccione --</option>
+                            <option value="Diurna">Diurna</option>
+                            <option value="Mixta">Mixta</option>
+                            <option value="Nocturna">Nocturna</option>
+                            <option value="Madrugada">Madrugada</option>
+                            <option value="Fin de Semana">Fin de Semana</option>
+                        </select>
+                        <span th:if="${#fields.hasErrors('jornada')}" th:errors="*{jornada}" class="error-message"></span>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Modalidad</label>
+                        <select th:field="*{modalidad}" class="form-control" required>
+                            <option value="">-- Seleccione --</option>
+                            <option value="Presencial">Presencial</option>
+                            <option value="Virtual">Virtual</option>
+                            <option value="Mixta">Mixta</option>
+                        </select>
+                        <span th:if="${#fields.hasErrors('modalidad')}" th:errors="*{modalidad}" class="error-message"></span>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 30px;">
+                        <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Coordinación Académica</label>
+                        <select th:field="*{coordinacion}" class="form-control" required>
+                            <option value="">-- Seleccione Coordinación --</option>
+                            <option th:each="c : ${coordinaciones}" 
+                                    th:value="${c.id}" 
+                                    th:text="${c.nombre}">
+                            </option>
+                        </select>
+                        <span th:if="${#fields.hasErrors('coordinacion')}" th:errors="*{coordinacion}" class="error-message"></span>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <button type="submit" class="btn-main btn-create" style="border: none; cursor: pointer; flex: 1; justify-content: center;">
+                            Guardar Ficha
+                        </button>
+                        <a th:href="@{/fichas}" class="btn-cancel">Cancelar</a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
