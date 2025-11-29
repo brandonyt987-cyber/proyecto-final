@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Nuevo Instructor | SENA</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="icon" type="image/png" th:href="@{/img/logo-sena.png}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    
+    <style>
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        .form-col {
+            flex: 1; 
+        }
+        @media (max-width: 768px) {
+            .form-row { flex-direction: column; gap: 0; }
+        }
+    </style>
+</head>
+<body>
+    
+    <div th:replace="~{dashboard :: sidebar}"></div>
+    
+    <div class="main-content">
+        <header th:replace="~{dashboard :: header-top}"></header>
+
+        <div class="dashboard-area">
+            
+            <h3 style="text-align: center; margin-bottom: 25px;">Registrar Nuevo Instructor</h3>
+
+            <div class="form-container" style="max-width: 800px; margin: 0 auto;">
+                
+                <div th:if="${error}" style="background: #fee2e2; color: #991b1b; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: bold;">
+                    <span th:text="${error}"></span>
+                </div>
+
+                <form method="POST" th:action="@{/instructores/guardar}" th:object="${instructor}" novalidate>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Nombres</label>
+                            <input type="text" th:field="*{nombres}" class="form-control" placeholder="Ej: Carlos Andrés"
+                                   oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '')" required>
+                            <span th:if="${#fields.hasErrors('nombres')}" th:errors="*{nombres}" class="error-message"></span>
+                        </div>
+                        <div class="form-col">
+                            <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Apellidos</label>
+                            <input type="text" th:field="*{apellidos}" class="form-control" placeholder="Ej: López Pérez"
+                                   oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '')" required>
+                            <span th:if="${#fields.hasErrors('apellidos')}" th:errors="*{apellidos}" class="error-message"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Tipo Documento</label>
+                            <select th:field="*{tipoDocumento}" class="form-control" required>
+                                <option value="">-- Seleccione --</option>
+                                <option value="CC">Cédula de Ciudadanía</option>
+                                <option value="CE">Cédula de Extranjería</option>
+                                <option value="PEP">PEP</option>
+                            </select>
+                            <span th:if="${#fields.hasErrors('tipoDocumento')}" th:errors="*{tipoDocumento}" class="error-message"></span>
+                        </div>
+                        <div class="form-col">
+                            <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Número Documento</label>
+                            <input type="text" th:field="*{numeroDocumento}" class="form-control" placeholder="Sin puntos"
+                                   minlength="5"
+                                   oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')" required>
+                            <span th:if="${#fields.hasErrors('numeroDocumento')}" th:errors="*{numeroDocumento}" class="error-message"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Profesión</label>
+                            <input type="text" th:field="*{profesion}" class="form-control" placeholder="Ej: Ingeniero de Sistemas"
+                                   minlength="5" maxlength="50"
+                                   oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '')" required>
+                            <span th:if="${#fields.hasErrors('profesion')}" th:errors="*{profesion}" class="error-message"></span>
+                        </div>
+                        <div class="form-col">
+                            <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Teléfono</label>
+                            <input type="text" th:field="*{telefono}" class="form-control" placeholder="Celular (10 dígitos)"
+                                   maxlength="10" minlength="10"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+                            <span th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}" class="error-message"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row" style="margin-bottom: 30px;">
+                        <div class="form-col">
+                            <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Correo Electrónico</label>
+                            <input type="email" th:field="*{correo}" class="form-control" placeholder="instructor@sena.edu.co" required>
+                            <span th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}" class="error-message"></span>
+                        </div>
+                        <div class="form-col">
+                            <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Asignar a Coordinación</label>
+                            <select th:field="*{coordinacion}" class="form-control" required>
+                                <option value="">-- Seleccione --</option>
+                                <option th:each="c : ${coordinaciones}" 
+                                        th:value="${c.id}" 
+                                        th:text="${c.nombre}">
+                                </option>
+                            </select>
+                            <span th:if="${#fields.hasErrors('coordinacion')}" th:errors="*{coordinacion}" class="error-message"></span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <button type="submit" class="btn-main btn-create" style="border: none; cursor: pointer; flex: 1; justify-content: center;">
+                            Guardar Instructor
+                        </button>
+                        <a th:href="@{/instructores}" class="btn-cancel">Cancelar</a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

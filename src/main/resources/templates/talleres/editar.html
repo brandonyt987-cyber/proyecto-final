@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Editar Taller | SENA</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="icon" type="image/png" th:href="@{/img/logo-sena.png}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    
+    <style>
+        .form-row { display: flex; gap: 20px; margin-bottom: 15px; }
+        .form-col { flex: 1; }
+        @media (max-width: 768px) { .form-row { flex-direction: column; gap: 0; } }
+
+        
+        .error-message { color: #dc3545; font-size: 0.85rem; display: block; margin-top: 5px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{dashboard :: sidebar}"></div>
+    <div class="main-content">
+        <header th:replace="~{dashboard :: header-top}"></header>
+
+        <div class="dashboard-area">
+            <div class="form-container" style="margin:0 auto; max-width: 850px;">
+                
+                <h3 style="text-align: center; margin-bottom: 25px;">Editar Taller</h3>
+                
+                <div th:if="${error}" style="background: #fee2e2; color: #991b1b; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: bold;">
+                    <span th:text="${error}"></span>
+                </div>
+
+                <form method="POST" th:action="@{/talleres/actualizar}" th:object="${taller}" novalidate>
+                    
+                    <input type="hidden" th:field="*{id}">
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="font-weight: 700; color: #555;">Nombre del Taller</label>
+                        <input type="text" th:field="*{nombreTaller}" class="form-control" required>
+                        <span th:if="${#fields.hasErrors('nombreTaller')}" th:errors="*{nombreTaller}" class="error-message"></span>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label style="font-weight: 700; color: #555;">Ficha / Programa</label>
+                            <select th:field="*{ficha}" class="form-control" required>
+                                <option value="">-- Seleccione Ficha --</option>
+                                <option th:each="f : ${listaFichas}" 
+                                        th:value="${f.id}" 
+                                        th:text="${f.codigo} + ' - ' + ${f.programa} + ' (' + ${f.jornada} + ')'"
+                                        th:selected="${f.id == taller.ficha.id}"></option>
+                            </select>
+                            <span th:if="${#fields.hasErrors('ficha')}" th:errors="*{ficha}" class="error-message"></span>
+                        </div>
+                        <div class="form-col">
+                            <label style="font-weight: 700; color: #555;">Profesional a Cargo</label>
+                            <select th:field="*{profesional.id}" class="form-control" required>
+                                <option value="">-- Seleccione Profesional --</option>
+                                <option th:each="p : ${listaProfesionales}" 
+                                        th:value="${p.id}" 
+                                        th:text="${p.nombre} + ' (' + ${p.rol} + ')'"
+                                        th:selected="${p.id == taller.profesional.id}"></option>
+                            </select>
+                            <span th:if="${#fields.hasErrors('profesional')}" th:errors="*{profesional}" class="error-message"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-col" style="flex: 3;">
+                            <label style="font-weight: 700; color: #555;">Fecha</label>
+                            <input type="date" th:field="*{fecha}" class="form-control" th:min="${minDate}" required>
+                            <span th:if="${#fields.hasErrors('fecha')}" th:errors="*{fecha}" class="error-message"></span>
+                        </div>
+                        <div class="form-col" style="flex: 1;">
+                            <label style="font-weight: 700; color: #555;">Cupo Solicitado</label>
+                            <input type="number" th:field="*{cupo}" class="form-control" min="1" required>
+                            <span th:if="${#fields.hasErrors('cupo')}" th:errors="*{cupo}" class="error-message"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label style="font-weight: 700; color: #555;">Hora Inicio (9am - 4pm)</label>
+                            <input type="time" th:field="*{horaInicio}" class="form-control" min="09:00" max="16:00" required>
+                            <span th:if="${#fields.hasErrors('horaInicio')}" th:errors="*{horaInicio}" class="error-message"></span>
+                        </div>
+                        <div class="form-col">
+                            <label style="font-weight: 700; color: #555;">Hora Fin (9am - 4pm)</label>
+                            <input type="time" th:field="*{horaFin}" class="form-control" min="09:00" max="16:00" required>
+                            <span th:if="${#fields.hasErrors('horaFin')}" th:errors="*{horaFin}" class="error-message"></span>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:30px; display:flex; justify-content:center; gap:15px;">
+                        
+                        <button type="submit" class="btn-main btn-edit" style="cursor:pointer; width:100%; max-width:300px; justify-content:center;">
+                            Actualizar Taller
+                        </button>
+
+                        <a th:href="@{/talleres}" class="btn-cancel" style="width:100%; max-width:300px;">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

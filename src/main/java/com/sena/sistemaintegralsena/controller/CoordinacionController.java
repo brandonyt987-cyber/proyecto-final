@@ -1,0 +1,91 @@
+package com.sena.sistemaintegralsena.controller;
+
+import com.sena.sistemaintegralsena.entity.Coordinacion;
+import com.sena.sistemaintegralsena.service.CoordinacionService;
+import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+@Controller
+@RequestMapping("/coordinaciones")
+//Permite entrada a Admin, Psicóloga y T. Social (principalmente para listar)
+@PreAuthorize("hasAnyRole('ADMIN', 'PSICOLOGA', 'T_SOCIAL')")
+public class CoordinacionController {
+
+    private final CoordinacionService service;
+
+    public CoordinacionController(CoordinacionService service) {
+        this.service = service;
+    }
+
+    // Acceso compartido (Hereda el permiso de la clase)
+    @GetMapping
+    public String listar(Model model) {
+        model.addAttribute("coordinaciones", service.listarTodas());
+        return "coordinaciones/lista";
+    }
+
+    //ESTO ES PARA SOLO ADMIN
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/crear")
+    public String formCrear(Model model) {
+        model.addAttribute("coordinacion", new Coordinacion());
+        return "coordinaciones/crear";
+    }
+
+    //ESTO ES PARA SOLO ADMIN
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/guardar")
+    public String guardar(@Valid @ModelAttribute Coordinacion coordinacion, BindingResult result, Model model, RedirectAttributes redirect) {
+        if (result.hasErrors()) {
+            return "coordinaciones/crear";
+        }
+        try {
+            service.guardar(coordinacion);
+            redirect.addFlashAttribute("exito", "Coordinación guardada correctamente.");
+        } catch (Exception e) {
+            model.addAttribute("error", e.getMessage());
+            return "coordinaciones/crear";
+        }
+        return "redirect:/coordinaciones";
+    }
+
+    //ESTO ES PARA SOLO ADMIN x3 XD
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/editar/{id}")
+    public String formEditar(@PathVariable Long id, Model model) {
+        Coordinacion coord = service.buscarPorId(id);
+        if (coord == null) return "redirect:/coordinaciones";
+        model.addAttribute("coordinacion", coord);
+        return "coordinaciones/editar";
+    }
+
+    //ESTO ES PARA SOLO ADMIN
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/actualizar")
+    public String actualizar(@Valid @ModelAttribute Coordinacion coordinacion, BindingResult result, RedirectAttributes redirect) {
+        if (result.hasErrors()) {
+            return "coordinaciones/editar";
+        }
+        service.guardar(coordinacion);
+        redirect.addFlashAttribute("exito", "Coordinación actualizada.");
+        return "redirect:/coordinaciones";
+    }
+
+    //ESTO ES PARA SOLO ADMIN ... y la ... seguia y seguia jsjsjs
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/eliminar/{id}")
+    public String eliminar(@PathVariable Long id, RedirectAttributes redirect) {
+        try {
+            service.eliminar(id);
+            redirect.addFlashAttribute("exito", "Coordinación eliminada.");
+        } catch (Exception e) {
+            redirect.addFlashAttribute("error", "No se puede eliminar (posiblemente esté en uso).");
+        }
+        return "redirect:/coordinaciones";
+    }
+}

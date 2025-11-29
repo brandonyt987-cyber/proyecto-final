@@ -2,79 +2,80 @@ package com.sena.sistemaintegralsena.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.http.HttpMethod; 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.sena.sistemaintegralsena.security.CustomUserDetailsService;
-
 @Configuration
-@EnableWebSecurity
+@EnableMethodSecurity 
 public class SecurityConfig {
 
-    private final CustomUserDetailsService userDetailsService;
-
-    public SecurityConfig(CustomUserDetailsService uds) {
-        this.userDetailsService = uds;
-    }
-
     @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider auth = new DaoAuthenticationProvider();
-        auth.setUserDetailsService(userDetailsService);
-        auth.setPasswordEncoder(passwordEncoder());
-        return auth;
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-            .csrf(csrf -> csrf.disable())   // Mientras desarrollamos
-            .headers(headers -> headers.frameOptions(frame -> frame.disable())) // Para H2-console
-            .authorizeHttpRequests(auth -> auth
-                // Archivos públicos
-                .requestMatchers(
-                        "/css/**",
-                        "/js/**",
-                        "/img/**",
-                        "/favicon.ico",
-                        "/registro",
-                        "/login",
-                        "/error",
-                        "/h2-console/**"
-                ).permitAll()
+                .csrf(csrf -> csrf.disable()) 
+                .authorizeHttpRequests(auth -> auth
 
-                // Rutas por rol
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/psico/**").hasRole("PSICOLOGA")
+                        // Recursos estáticos
+                        .requestMatchers("/css/**", "/js/**", "/img/**").permitAll()
 
-                // Todo lo demás requiere autenticación
-                .anyRequest().authenticated()
-            )
+                        // Login y registro (GET)
+                        .requestMatchers("/login", "/registro").permitAll()
+                        
+                        // Permitir el POST para guardar registro
+                        .requestMatchers(HttpMethod.POST, "/registro/guardar").permitAll() 
+                        
+                        // Error page
+                        .requestMatchers("/error").permitAll() 
 
-            // Login
-            .formLogin(form -> form
-                .loginPage("/login")
-                .defaultSuccessUrl("/dashboard", true)
-                .permitAll()
-            )
+                        // Dashboard
+                        .requestMatchers("/dashboard").authenticated()
 
-            // Logout
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout")
-                .permitAll()
-            )
+                        // MÓDULO EXCLUSIVO DE ADMIN
+                        .requestMatchers("/usuarios/**").hasRole("ADMIN")
 
-            .authenticationProvider(authenticationProvider());
+                        // MÓDULOS COMPARTIDOS (ADMIN, PSICOLOGA, T_SOCIAL)
+                        // Aquí agregamos las nuevas rutas permitidas para todos
+                        .requestMatchers(
+                            "/fichas/**", 
+                            "/aprendices/**", 
+                            "/comite/**", 
+                            "/atencion/**", 
+                            "/talleres/**",
+                            "/coordinaciones/**", 
+                            "/instructores/**",   
+                            "/voceros/**"         
+                        ).hasAnyRole("ADMIN", "PSICOLOGA", "T_SOCIAL")
+
+                        // Todo lo demás requiere login
+                        .anyRequest().authenticated()
+                )
+                .formLogin(login -> login
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/dashboard", true)
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
+                        .permitAll()
+                );
 
         return http.build();
     }

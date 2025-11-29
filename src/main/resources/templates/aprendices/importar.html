@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Carga Masiva | SENA</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="icon" type="image/png" th:href="@{/img/logo-sena.png}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    
+    <style>
+        /* Estilo especial para el botón de importar VERDESITO WONITO */
+        .btn-import {
+            background: linear-gradient(135deg, #219150, #2ecc71);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(33, 145, 80, 0.3);
+            width: 100%;
+        }
+        .btn-import:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(33, 145, 80, 0.4);
+        }
+
+        /* Estilo para la zona de carga de archivo */
+        .upload-zone {
+            border: 2px dashed #cbd5e1;
+            background-color: #f8f9fa;
+            padding: 40px 20px;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+            margin: 25px 0;
+            position: relative;
+        }
+        .upload-zone:hover {
+            border-color: #2ecc71;
+            background-color: #f0fdf4;
+        }
+        .upload-input {
+            width: 100%;
+            cursor: pointer;
+        }
+        
+        /* Caja de instrucciones */
+        .info-box {
+            background: #eef2f7;
+            border-left: 5px solid #6A11CB;
+            padding: 15px 20px;
+            border-radius: 6px;
+            text-align: left;
+            margin-bottom: 20px;
+            color: #444;
+        }
+    </style>
+</head>
+<body>
+    
+    <div th:replace="~{dashboard :: sidebar}"></div>
+    
+    <div class="main-content">
+        <header th:replace="~{dashboard :: header-top}"></header>
+
+        <div class="dashboard-area">
+            
+            <div class="form-container" style="margin:0 auto; max-width: 600px; text-align: center;">
+                
+                <h2 style="color: #2c3e50; margin-bottom: 20px; font-weight: 800;">Carga Masiva de Aprendices</h2>
+                
+                <div th:if="${error}" style="background: #fee2e2; color: #991b1b; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: bold;">
+                    <span th:text="${error}"></span>
+                </div>
+
+                <div class="info-box">
+                    <p style="margin: 0 0 10px 0; font-size: 0.95rem;">
+                        <strong>📝 Instrucciones:</strong> Suba un archivo Excel (<code>.xlsx</code>) con las columnas en este orden exacto:
+                    </p>
+                    <small style="display: block; line-height: 1.5; color: #666;">
+                        Nombres | Apellidos | TipoDoc | NumDoc | Fecha Nacimiento | Correo | Celular | Etapa | CodigoFicha
+                    </small>
+                </div>
+
+                <form method="POST" th:action="@{/aprendices/upload}" enctype="multipart/form-data" novalidate>
+                    
+                    <div class="upload-zone">
+                        <label style="display: block; margin-bottom: 10px; font-weight: 700; color: #555;">Seleccionar Archivo Excel</label>
+                        <input type="file" name="file" accept=".xlsx" class="form-control upload-input" required>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <button type="submit" class="btn-import">
+                             Subir y Procesar
+                        </button>
+                        
+                        <div style="margin-top: 15px;">
+                            <a th:href="@{/aprendices}" class="btn-cancel" style="background: transparent; border: 1px solid #e2e8f0;">
+                                Cancelar
+                            </a>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

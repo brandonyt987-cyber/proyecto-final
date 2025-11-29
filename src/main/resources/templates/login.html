@@ -1,141 +1,70 @@
 <!DOCTYPE html>
-<html lang="es">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <title>Iniciar Sesión | Sistema Integral</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ingreso - Sistema Integral SENA</title>
-
-    <link rel="icon" type="image/x-icon" href="/img/sena.ico">
-
-    <style>
-        body {
-            background: linear-gradient(135deg, #6a1b9a, #4a0e75);
-            font-family: 'Segoe UI', Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .login-card {
-            background: #ffffff;
-            width: 410px;
-            border-radius: 18px;
-            padding: 40px 35px;
-            box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.25);
-            animation: fadeIn 0.5s ease-in-out;
-            text-align: center;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .login-card img {
-            width: 85px;
-            margin-bottom: 10px;
-        }
-
-        h2 {
-            margin-top: 0;
-            font-size: 26px;
-            color: #6a1b9a;
-            font-weight: 700;
-            margin-bottom: 25px;
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-            text-align: left;
-        }
-
-        input {
-            width: 100%;
-            padding: 13px;
-            border-radius: 10px;
-            border: 1px solid #ccc;
-            font-size: 15px;
-            transition: 0.2s;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #6a1b9a;
-            box-shadow: 0 0 6px rgba(106, 27, 154, 0.4);
-        }
-
-        button {
-            width: 100%;
-            padding: 13px;
-            background: #f9a825;
-            border: none;
-            border-radius: 10px;
-            font-size: 17px;
-            color: #fff;
-            cursor: pointer;
-            font-weight: bold;
-            margin-top: 10px;
-            transition: background 0.2s;
-        }
-
-        button:hover {
-            background: #ffb300;
-        }
-
-        .error {
-            color: #d32f2f;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        .footer-text {
-            margin-top: 18px;
-            font-size: 14px;
-        }
-
-        .footer-text a {
-            color: #6a1b9a;
-            font-weight: bold;
-            text-decoration: none;
-        }
-
-        .footer-text a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
 </head>
-
 <body>
 
-    <div class="login-card">
-        <img src="/img/sena.png" alt="Logo SENA">
+    <div class="auth-sidebar">
 
-        <h2>Ingreso al Sistema</h2>
+        <h1 class="nexus-title">NEXUS</h1>
 
-        <form action="/login" method="post">
+        <h1>Bienestar al Aprendiz</h1>
+        <p>Sistema Integral de Gestión SENA</p>
+    </div>
 
-            <div th:if="${param.error}" class="error">
-                Usuario o contraseña incorrectos
+    <div class="auth-content">
+        <div class="form-wrapper">
+            
+            <div class="logo-container">
+                <img th:src="@{/img/logo-sena.png}" alt="Logo SENA" class="logo-img">
+                <h2>¡Hola de nuevo!</h2>
+                <p class="subtitle">Ingresa tus credenciales para acceder.</p>
             </div>
 
-            <div class="input-group">
-                <input type="email" name="username" placeholder="Correo institucional" required>
+            <!-- Mensajes superiores personalizados y wapos -->
+            <div th:if="${param.error}" class="alert-error">
+                Correo o contraseña incorrectos. Intenta nuevamente.
             </div>
 
-            <div class="input-group">
-                <input type="password" name="password" placeholder="Contraseña" required>
+            <div th:if="${param.logout}" class="alert-success">
+                Has cerrado sesión correctamente.
             </div>
 
-            <button type="submit">Ingresar</button>
+            <div th:if="${registroExitoso}" class="alert-success">
+                <span th:text="${registroExitoso}"></span>
+            </div>
 
-        </form>
+            <!-- FORMULARIO -->
+            <form method="POST" th:action="@{/login}" novalidate>
 
-        <div class="footer-text">
-            ¿No tienes una cuenta?
-            <a href="/registro">Regístrate aquí</a>
+                <div class="form-group">
+                    <label for="username">Correo Institucional</label>
+                    <input type="email" id="username" name="username" class="form-control"
+                           placeholder="ejemplo@sena.edu.co" required>
+
+                    <!-- Mensaje de error personalizado x2-->
+                    <div class="field-error" id="emailError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" name="password" class="form-control"
+                           placeholder="••••••••" required>
+
+                    <!-- Mensaje de error personalizado x3-->
+                    <div class="field-error" id="passwordError"></div>
+                </div>
+
+                <button type="submit" class="btn-auth">Ingresar</button>
+            </form>
+
+            <div class="auth-footer">
+                <p>¿No tienes una cuenta? <a th:href="@{/registro}" class="auth-link">Regístrate aquí</a></p>
+            </div>
         </div>
     </div>
 
