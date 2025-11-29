@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <img th:src="@{/img/sena.png}" alt="Logo SENA" class="logo">
+            <h2 class="system-title">SISTEMA</h2>
+
+            <a href="/dashboard" class="nav-button">
+                <span>🏠</span> Dashboard
+            </a>
+
+            <a href="/usuarios" class="nav-button">
+                <span>👥</span> Usuarios
+            </a>
+
+            <a href="/comite" class="nav-button">
+                <span>📄</span> Comité
+            </a>
+
+            <a href="/atencion" class="nav-button">
+                <span>💬</span> Atención Individual
+            </a>
+
+            <a href="/talleres" class="nav-button">
+                <span>🏫</span> Talleres Mensuales
+            </a>
+
+            <a href="/logout" class="logout-button">Cerrar sesión</a>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="content">
+
+            <img th:src="@{/img/dash.png}" class="dash-image">
+
+            <p class="subtext">Prueba del dashboard XD</p>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

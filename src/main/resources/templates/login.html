@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingreso - Sistema Integral SENA</title>
+
+    <link rel="icon" type="image/x-icon" href="/img/sena.ico">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #6a1b9a, #4a0e75);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-card {
+            background: #ffffff;
+            width: 410px;
+            border-radius: 18px;
+            padding: 40px 35px;
+            box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.25);
+            animation: fadeIn 0.5s ease-in-out;
+            text-align: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-card img {
+            width: 85px;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 26px;
+            color: #6a1b9a;
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #6a1b9a;
+            box-shadow: 0 0 6px rgba(106, 27, 154, 0.4);
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            background: #f9a825;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #ffb300;
+        }
+
+        .error {
+            color: #d32f2f;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .footer-text {
+            margin-top: 18px;
+            font-size: 14px;
+        }
+
+        .footer-text a {
+            color: #6a1b9a;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .footer-text a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-card">
+        <img src="/img/sena.png" alt="Logo SENA">
+
+        <h2>Ingreso al Sistema</h2>
+
+        <form action="/login" method="post">
+
+            <div th:if="${param.error}" class="error">
+                Usuario o contraseña incorrectos
+            </div>
+
+            <div class="input-group">
+                <input type="email" name="username" placeholder="Correo institucional" required>
+            </div>
+
+            <div class="input-group">
+                <input type="password" name="password" placeholder="Contraseña" required>
+            </div>
+
+            <button type="submit">Ingresar</button>
+
+        </form>
+
+        <div class="footer-text">
+            ¿No tienes una cuenta?
+            <a href="/registro">Regístrate aquí</a>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,89 @@
+/* Layout general */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    overflow-y: scroll;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 260px;
+    background-color: #4B0082;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+    overflow-y: auto;
+}
+
+.logo {
+    width: 100px;
+    margin-bottom: 10px;
+}
+
+.system-title {
+    margin-top: 0;
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+/* Botones */
+.nav-button {
+    width: 80%;
+    padding: 15px;
+    margin: 10px 0;
+    background: #7a1fa2;
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 17px;
+    transition: 0.3s;
+}
+
+.nav-button:hover {
+    background: #9c27b0;
+}
+
+.logout-button {
+    margin-top: auto;
+    margin-bottom: 20px;
+    background: #e53935;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+}
+
+/* Contenido */
+.content {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+/* Imagen del dashboard */
+.dash-image {
+    width: 90%;
+    height: 160px;        /* Mantiene el alto que tú querías */
+    object-fit: contain;  /* 🔥 Evita que se corte */
+    border-radius: 15px;
+    background: white;    /* Para que no se vea recortada */
+    align-self: center;
+}
+
+/* Texto abajo de la imagen */
+.subtext {
+    font-size: 20px;
+    margin-top: 20px;
+}
