@@ -4,7 +4,7 @@ import com.sena.sistemaintegralsena.dto.UsuarioRegistroDTO;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-
+// ¡CRÍTICO! Esta clase debe estar en su propio archivo.
 public class PasswordMatchesValidator 
     implements ConstraintValidator<PasswordMatches, Object> {
 

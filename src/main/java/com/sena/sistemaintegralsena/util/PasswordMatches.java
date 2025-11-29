@@ -4,7 +4,7 @@ import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import java.lang.annotation.*;
 
-
+// ¡CRÍTICO! Esta clase debe estar en un archivo separado de PasswordMatchesValidator.
 @Constraint(validatedBy = PasswordMatchesValidator.class)
 @Target({ ElementType.TYPE, ElementType.ANNOTATION_TYPE })
 @Retention(RetentionPolicy.RUNTIME)

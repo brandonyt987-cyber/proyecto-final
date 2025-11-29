@@ -1,31 +1,27 @@
-/* =========================================
-   1. ESTILOS BASE Y LAYOUT GENERAL (NEXUS)
-========================================= */
+/* Archivo: dashboard.css */
+
+/* Estilos Base */
 body {
-    display: block !important; 
     margin: 0;
     padding: 0;
-    background: #f0f2f7;
-    min-height: 100vh;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    overflow-x: hidden;
+    background-color: #f4f7f6; 
+    min-height: 100vh; 
+    /* Quitamos display:flex del body para evitar conflictos de scroll */
 }
 
-/* =========================================
-   2. SIDEBAR 
-========================================= */
+/* 1. SIDEBAR (Menú Lateral) */
 .sidebar {
     width: 250px;
-    background: linear-gradient(180deg, #6A11CB, #2575FC);
+    background-color: #0077c9; /* Azul SENA */
     color: white;
     padding: 20px 0;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    overflow-y: auto;
-    box-shadow: 0 0 15px rgba(0,0,0,0.25);
+    height: 100vh; 
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    position: fixed; /* Fijo a la izquierda */
+    top: 0; 
+    left: 0; 
     z-index: 1000;
+    overflow-y: auto; /* Scroll si el menú es muy largo */
 }
 
 .sidebar h3 {
@@ -34,14 +30,13 @@ body {
     text-transform: uppercase;
     letter-spacing: 1px;
     font-size: 1.2rem;
-    color: #ffffff;
+    padding: 0 10px;
 }
 
 .sidebar ul {
     list-style: none;
     padding: 0;
     margin: 0;
-    padding-bottom: 40px;
 }
 
 .sidebar ul li a {
@@ -49,84 +44,55 @@ body {
     padding: 15px 20px;
     text-decoration: none;
     color: white;
+    transition: background-color 0.3s;
     font-weight: 600;
     border-left: 4px solid transparent;
-    transition: 0.3s ease;
 }
 
 .sidebar ul li a:hover,
 .sidebar ul li.active a {
-    background: rgba(255,255,255,0.15);
-    border-left: 4px solid #00f6ff;
-    backdrop-filter: blur(4px);
+    background-color: #0060a0;
+    border-left: 4px solid #1abc9c; /* Detalle verde al activo/hover */
 }
 
-/* LOGO ENCIMA DEL SIDEBAR */
-.sidebar-logo {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-    margin-top: -10px;
-}
-
-.sidebar-logo img {
-    width: 100px; 
-    display: block;
-    margin: 10px auto;
-    mix-blend-mode: lighten;
-    background: transparent !important;
-}
-
-/* =========================================
-   3. CONTENIDO PRINCIPAL jojojo
-========================================= */
+/* 2. CONTENIDO PRINCIPAL */
 .main-content {
-    margin-left: 250px;
-    width: calc(100% - 250px);
+    margin-left: 250px; /* CRÍTICO: Empuja el contenido a la derecha del menú */
+    width: auto; 
     padding: 0;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
-/* =========================================
-   4. HEADER TOP — CON RULO.PNG jsjss no hallé mas nombres y me dio flojera XDDD
-========================================= */
+/* 3. ENCABEZADO SUPERIOR CON IMAGEN */
 .header-top {
-    background-color: #6A11CB; 
-    background-image: url('/img/rulo.png'); 
-    background-repeat: repeat; 
-    background-size: auto 100%; 
-    
+    background-color: white;
     padding: 10px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 120px; 
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    
-    position: sticky;
-    top: 0;
-    z-index: 900;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    height: 150px; /* Altura fija para que la imagen tenga espacio */
 }
 
+/* Contenedor de la imagen en el header */
 .header-image-container {
-    flex-grow: 1;
-    max-width: 100%; 
+    width: 80%; /* Ocupa el 80% del ancho disponible en el header */
     height: 100%;
     display: flex;
     align-items: center;
-    overflow: hidden;
 }
 
+/* La imagen en sí */
 .header-dashboard-image {
-    width: auto;
     max-width: 100%;
-    max-height: 95%; 
-    object-fit: contain;
+    max-height: 100%;
+    object-fit: contain; /* Muestra la imagen completa sin recortar */
+    object-position: left center; /* Alineada a la izquierda */
 }
 
+/* Sección de usuario a la derecha */
 .user-controls {
     display: flex;
     flex-direction: column;
@@ -134,285 +100,58 @@ body {
     min-width: 150px;
 }
 
-.user-info {
-    font-weight: 700;
-    color: #ffffff !important; 
+.header-top .user-info {
+    font-weight: 600;
+    color: #333;
     margin-bottom: 5px;
-    font-size: 0.95rem;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
-/* Botón Cerrar Sesión (Blanco con letras rojas) */
-.btn-logout {
-    background: white;
-    border: none;
-    border-radius: 50px;
-    color: #ff4d4d;
-    cursor: pointer;
-    padding: 8px 20px;
-    font-weight: 700;
-    font-size: 0.85rem;
-    transition: 0.25s;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+.header-top .logout-link {
     text-decoration: none;
-    display: inline-block;
+    color: #d9534f;
+    font-size: 0.9em;
+    font-weight: 600;
+    border: 1px solid #d9534f;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: all 0.3s;
 }
 
-.btn-logout:hover {
-    background: #ff4d4d;
+.header-top .logout-link:hover {
+    background-color: #d9534f;
     color: white;
-    box-shadow: 0 4px 10px rgba(255, 77, 77, 0.3);
 }
 
+/* 4. DASHBOARD GRID (Área de Métricas) */
 .dashboard-area {
-    padding: 40px;
+    padding: 30px;
     flex-grow: 1;
 }
 
-/* =========================================
-   5. TARJETAS (CARDS) — 3 POR FILA PA QUE SE VEA WAPETON
-========================================= */
-
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr) !important; 
-    gap: 25px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
     margin-top: 20px;
 }
 
 .stat-card {
     background: white;
-    padding: 30px;
-    border-radius: 16px;
-    border-top: none; 
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.stat-card::after {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 6px;
-    background: linear-gradient(90deg, #6A11CB, #2575FC);
-}
-
-.stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    border-top: 4px solid #1abc9c; /* Borde superior de color */
 }
 
 .stat-card h4 {
-    margin: 0 0 15px 0;
-    color: #6c757d;
-    text-transform: uppercase;
-    font-size: 0.9rem;
-    font-weight: 700;
+    color: #0077c9;
+    margin-top: 0;
+    font-size: 1.1em;
 }
 
 .stat-card .value {
-    margin: 0;
-    font-size: 3rem;
-    font-weight: 800;
-    background: linear-gradient(90deg, #333, #555);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 0;
 }
-
-/* =========================================
-   6. TABLAS Y BOTONES ESTILO PÍLDORA
-========================================= */
-.actions-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-}
-
-.btn-main {
-    padding: 12px 24px;
-    text-decoration: none;
-    border-radius: 50px;
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    color: white;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-.btn-create {
-    background: linear-gradient(135deg, #6A11CB, #2575FC);
-}
-.btn-create:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(37, 117, 252, 0.3);
-}
-
-.table-container {
-    width: 100%;
-    background: white;
-    padding: 30px;
-    border-radius: 16px;
-    overflow-x: auto;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-}
-
-.crud-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    white-space: nowrap;
-}
-
-.crud-table thead {
-    background: linear-gradient(90deg, #f8f9fa, #e9ecef);
-}
-
-.crud-table th {
-    padding: 18px;
-    text-align: left;
-    color: #495057;
-    text-transform: uppercase;
-    font-size: 0.8rem;
-    font-weight: 700;
-    border-bottom: 2px solid #dee2e6;
-}
-
-.crud-table td {
-    padding: 18px;
-    border-bottom: 1px solid #f1f3f5;
-    color: #444;
-}
-
-.crud-table .center {
-    text-align: center;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-}
-
-.btn-table-action {
-    padding: 6px 14px;
-    border-radius: 50px;
-    text-decoration: none;
-    font-size: 0.85em;
-    color: white !important;
-    font-weight: 700;
-    transition: 0.2s;
-    display: inline-flex;
-    align-items: center;
-}
-
-.btn-edit { background: linear-gradient(135deg, #f09819, #edde5d); }
-.btn-edit:hover { transform: translateY(-2px); }
-
-.btn-delete { background: linear-gradient(135deg, #ff416c, #ff4b2b); }
-.btn-delete:hover { transform: translateY(-2px); }
-
-.badge-info {
-    background: rgba(37, 117, 252, 0.1);
-    color: #2575FC;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-weight: 700;
-    font-size: 0.85em;
-}
-
-/* =========================================
-   7. FORMULARIOS
-========================================= */
-.form-container {
-    background: #ffffff;
-    padding: 40px;
-    border-radius: 16px;
-    width: 100%;
-    max-width: 900px;
-    margin: 0 auto;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-}
-
-.form-control {
-    width: 100%;
-    padding: 12px 15px;
-    border: 1px solid #e2e8f0;
-    border-radius: 50px;
-    box-sizing: border-box;
-    outline: none;
-    transition: 0.3s;
-    background: #f8f9fa;
-}
-
-.form-control:focus {
-    border-color: #6A11CB;
-    background: white;
-    box-shadow: 0 0 0 4px rgba(106, 17, 203, 0.1);
-}
-
-textarea.form-control {
-    border-radius: 16px;
-    resize: none;
-    height: 100px;
-    overflow-y: auto;
-    font-family: inherit;
-}
-
-/* =========================================
-   8. MENSAJES DE ERROR Y OTROS 
-========================================= */
-
-/* Mensajes de error de validación en Formularios  */
-.error-message {
-    display: block;          
-    width: 100%;             
-    margin-top: 5px;         
-    margin-bottom: 5px;      
-    color: #e74c3c;          
-    font-size: 0.85rem;      
-    font-weight: 600;
-    line-height: 1.4;        
-}
-
-/* Botón Cancelar (Grisesito) */
-.btn-cancel {
-    background-color: #e2e8f0; 
-    color: #64748b !important; 
-    padding: 12px 28px;        
-    border-radius: 50px;       
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 0.95rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    border: 1px solid transparent;
-}
-
-.btn-cancel:hover {
-    background-color: #cbd5e1; 
-    color: #334155 !important;
-    transform: translateY(-2px); 
-    text-decoration: none;
-}
-
-.stats-grid {
-             display: grid;
-             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-             gap: 20px;
-        }
-        .stat-card {
-             padding: 15px;
-             background: white;
-             border-radius: 8px;
-             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-             border-left: 5px solid transparent;
-        }
-        .stat-card h4 { margin-top: 0; font-size: 1em; color: #555; }
-        .stat-card .value { font-size: 2em; font-weight: bold; color: #0077c9; margin: 0; }

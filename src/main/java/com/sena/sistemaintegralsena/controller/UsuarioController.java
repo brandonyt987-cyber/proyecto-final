@@ -2,6 +2,7 @@ package com.sena.sistemaintegralsena.controller;
 
 import com.sena.sistemaintegralsena.dto.UsuarioEdicionDTO;
 import com.sena.sistemaintegralsena.dto.UsuarioRegistroDTO;
+import com.sena.sistemaintegralsena.entity.Rol;
 import com.sena.sistemaintegralsena.entity.Usuario;
 import com.sena.sistemaintegralsena.exceptions.EmailExistenteException;
 import com.sena.sistemaintegralsena.repository.RolRepository;
@@ -42,7 +43,7 @@ public class UsuarioController {
     public String mostrarFormularioCrear(Model model) {
         model.addAttribute("usuarioDTO", new UsuarioRegistroDTO());
         model.addAttribute("roles", rolRepository.findAll());
-        return "usuarios/crear"; 
+        return "usuarios/crear"; // Retorna crear.html
     }
 
     @PostMapping("/guardar")
@@ -91,7 +92,7 @@ public class UsuarioController {
 
         model.addAttribute("usuarioEdicion", dto);
         model.addAttribute("roles", rolRepository.findAll());
-        return "usuarios/editar"; 
+        return "usuarios/editar"; // Retorna editar.html
     }
 
     @PostMapping("/actualizar")

@@ -42,7 +42,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuarioRepository.save(usuario);
     }
 
-    // IMPLEMENTACIÓN DE ACTUALIZAR
+    // 🆕 IMPLEMENTACIÓN DE ACTUALIZAR
     @Override
     public void actualizarUsuarioDesdeDTO(UsuarioEdicionDTO dto) throws EmailExistenteException {
         Usuario usuarioActual = usuarioRepository.findById(dto.getId())

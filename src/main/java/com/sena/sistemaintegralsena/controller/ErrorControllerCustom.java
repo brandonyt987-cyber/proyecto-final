@@ -23,7 +23,7 @@ public class ErrorControllerCustom implements ErrorController {
         model.addAttribute("status", status != null ? status.toString() : "Desconocido");
         model.addAttribute("message", message != null ? message.toString() : "No hay mensaje");
 
-
+        // Convertimos el stacktrace a string para mostrarlo en el HTML
         if (exception != null && exception instanceof Throwable throwable) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -33,6 +33,6 @@ public class ErrorControllerCustom implements ErrorController {
             model.addAttribute("stackTrace", "Ninguna");
         }
 
-        return "error"; 
+        return "error"; // tu error.html
     }
 }

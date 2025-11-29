@@ -1,9 +1,9 @@
 package com.sena.sistemaintegralsena.entity;
 
-import lombok.Data;
+import lombok.Data; // Importar Lombok
 import jakarta.persistence.*;
 
-@Data
+@Data // <-- CRÍTICO: Genera todos los get/set para Rol
 @Entity
 @Table(name = "roles")
 public class Rol {
@@ -15,6 +15,6 @@ public class Rol {
     // Usado por getNombre()
     private String nombre; 
 
-    // Constructor vacío (siempre recomendado para JPA) ojito
+    // Constructor vacío (siempre recomendado para JPA)
     public Rol() {}
 }

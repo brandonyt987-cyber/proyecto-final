@@ -8,15 +8,32 @@
     
     <link rel="stylesheet" type="text/css" th:href="@{/css/estilos.css}" href="/css/estilos.css">
     <link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}" href="/css/dashboard.css">
+          
+    <style>
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .btn-logout {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #d9534f;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 1em;
+            padding: 0;
+        }
+        .btn-logout:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
     
     <div class="sidebar" th:fragment="sidebar">
-
-        <div class="sidebar-logo">
-            <img src="/img/logo-sena.png" alt="Logo SENA">
-        </div>
-        <h3>SENA | NEXUS </h3>
+        <h3>SENA | SISTEMA INTEGRAL</h3>
         
         <ul>
             <li th:classappend="${request.requestURI == '/dashboard'} ? 'active'">
@@ -26,21 +43,6 @@
             <li sec:authorize="hasRole('ADMIN')" 
                 th:classappend="${request.requestURI.startsWith('/usuarios')} ? 'active'">
                 <a th:href="@{/usuarios}">Administrar Usuarios</a>
-            </li>
-
-            <li sec:authorize="hasRole('ADMIN') or hasAnyRole('PSICOLOGA', 'T_SOCIAL')" 
-                th:classappend="${request.requestURI.startsWith('/coordinaciones')} ? 'active'">
-                <a th:href="@{/coordinaciones}">Coordinaciones</a>
-            </li>
-            
-            <li sec:authorize="hasRole('ADMIN') or hasAnyRole('PSICOLOGA', 'T_SOCIAL')" 
-                th:classappend="${request.requestURI.startsWith('/instructores')} ? 'active'">
-                <a th:href="@{/instructores}">Instructores</a>
-            </li>
-            
-            <li sec:authorize="hasRole('ADMIN') or hasAnyRole('PSICOLOGA', 'T_SOCIAL')" 
-                th:classappend="${request.requestURI.startsWith('/voceros')} ? 'active'">
-                <a th:href="@{/voceros}">Voceros</a>
             </li>
 
             <li sec:authorize="hasRole('ADMIN') or hasAnyRole('PSICOLOGA', 'T_SOCIAL')"
@@ -86,48 +88,30 @@
         </header>
 
         <div class="dashboard-area">
-            
-            <div sec:authorize="hasAnyRole('ADMIN', 'PSICOLOGA', 'T_SOCIAL')">
+            <div sec:authorize="hasRole('ADMIN')">
                 <h3>Métricas del Sistema</h3>
-                
                 <div class="stats-grid">
-                    
-                    <div class="stat-card" style="border-left: 5px solid #3498db;" sec:authorize="hasRole('ADMIN')"> 
+                    <div class="stat-card">
                         <h4>Total de Usuarios</h4>
                         <p class="value" th:text="${totalUsuarios != null ? totalUsuarios : '0'}">0</p>
                     </div>
-                    
-                    <div class="stat-card" style="border-left: 5px solid #3498db;">
+                    <div class="stat-card">
                         <h4>Fichas Creadas</h4>
                         <p class="value" th:text="${totalFichas != null ? totalFichas : '0'}">0</p>
                     </div>
-                    
-                    <div class="stat-card" style="border-left: 5px solid #3498db;">
+                    <div class="stat-card">
                         <h4>Aprendices</h4>
-                        <p class="value" th:text="${totalAprendices != null ? totalAprendices : '0'}">0</p>
+                        <p class="value"th:text="${totalAprendices != null ? totalAprendices : '0'}">0</p>
                     </div>
-
-                    <div class="stat-card" style="border-left: 5px solid #3498db;">
-                        <h4>Coordinaciones</h4>
-                        <p class="value" th:text="${totalCoordinaciones != null ? totalCoordinaciones : '0'}">0</p>
-                    </div>
-
-                    <div class="stat-card" style="border-left: 5px solid #3498db;">
-                        <h4>Instructores</h4>
-                        <p class="value" th:text="${totalInstructores != null ? totalInstructores : '0'}">0</p>
-                    </div>
-
-                    <div class="stat-card" style="border-left: 5px solid #3498db;">
-                        <h4>Voceros</h4>
-                        <p class="value" th:text="${totalVoceros != null ? totalVoceros : '0'}">0</p>
-                    </div>
-                    
                 </div>
             </div>
             
+            <div sec:authorize="hasAnyRole('PSICOLOGA', 'T_SOCIAL')">
+                <h3>Bienvenido a tu Área de Trabajo</h3>
+                <p>Selecciona una opción del menú lateral para comenzar.</p>
             </div>
         </div>
     </div>
     
-</body>
+    </body>
 </html>

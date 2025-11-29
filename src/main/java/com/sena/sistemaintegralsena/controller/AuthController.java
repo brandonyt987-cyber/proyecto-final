@@ -4,7 +4,7 @@ import com.sena.sistemaintegralsena.dto.UsuarioRegistroDTO;
 import com.sena.sistemaintegralsena.entity.Rol;
 import com.sena.sistemaintegralsena.repository.RolRepository;
 import com.sena.sistemaintegralsena.service.UsuarioService;
-import com.sena.sistemaintegralsena.exceptions.EmailExistenteException; 
+import com.sena.sistemaintegralsena.exceptions.EmailExistenteException; // Importación corregida
 
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;

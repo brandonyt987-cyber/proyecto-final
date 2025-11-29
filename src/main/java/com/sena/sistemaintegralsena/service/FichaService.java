@@ -13,5 +13,6 @@ public interface FichaService {
     
     void eliminar(Long id);
     
+    // 🔑 ESTE ES EL MÉTODO QUE FALTABA
     long totalFichas();
 }

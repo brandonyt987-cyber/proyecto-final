@@ -22,7 +22,7 @@ public class UsuarioPrincipal implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Añadir el prefijo ROLE_
+        // CORRECCIÓN VITAL: Añadir el prefijo ROLE_
         String rolConPrefijo = "ROLE_" + usuario.getRol(); 
         return List.of(new SimpleGrantedAuthority(rolConPrefijo));
     }
