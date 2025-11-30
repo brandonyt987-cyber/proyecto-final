@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Carga Masiva</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+    <div th:replace="~{dashboard :: sidebar}"></div>
+    <div class="main-content">
+        <header th:replace="~{dashboard :: header-top}"></header>
+
+        <div class="dashboard-area">
+            <div class="form-container" style="margin:0 auto; text-align:center;">
+                <h2>Carga Masiva de Aprendices</h2>
+                
+                <div th:if="${error}" class="alert-error-global"><span th:text="${error}"></span></div>
+
+                <div style="margin: 20px 0; padding: 15px; background: #eef2f7; border-radius: 8px;">
+                    <p><strong>Instrucciones:</strong> Suba un archivo Excel (.xlsx) con las siguientes columnas en orden:</p>
+                    <small>Nombres | Apellidos | TipoDoc | NumDoc | Fecha Nacimiento | Correo | Celular | Etapa | CodigoFicha</small>
+                </div>
+
+                <form method="POST" th:action="@{/aprendices/upload}" enctype="multipart/form-data">
+                    
+                    <div class="form-group" style="margin: 30px 0;">
+                        <input type="file" name="file" accept=".xlsx" class="form-control" required 
+                               style="padding: 10px; border: 2px dashed #ccc;">
+                    </div>
+
+                    <button type="submit" class="btn-import" style="width:100%; justify-content:center;">
+                        Subir y Procesar
+                    </button>
+                    
+                    <a th:href="@{/aprendices}" class="btn-cancel" style="margin-top:10px;">Cancelar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

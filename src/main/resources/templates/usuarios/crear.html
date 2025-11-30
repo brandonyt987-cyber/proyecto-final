@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Crear Usuario</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+    
+    <div th:replace="~{dashboard :: sidebar}"></div>
+    
+    <div class="main-content">
+        <header th:replace="~{dashboard :: header-top}"></header>
+
+        <div class="dashboard-area">
+            <div class="form-container" style="margin:0 auto;">
+                <h2>Crear Nuevo Usuario</h2>
+                
+                <div th:if="${error}" class="alert-error-global">
+                    <span th:text="${error}"></span>
+                </div>
+
+                <form method="POST" th:action="@{/usuarios/guardar}" th:object="${usuarioDTO}">
+                    
+                    <div class="form-group">
+                        <label>Nombre Completo:</label>
+                        <input type="text" th:field="*{nombre}" class="form-control" required>
+                        <span th:errors="*{nombre}" class="error-message"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" th:field="*{email}" class="form-control" required>
+                        <span th:errors="*{email}" class="error-message"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Contraseña:</label>
+                        <input type="password" th:field="*{password}" class="form-control" required>
+                        <span th:errors="*{password}" class="error-message"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Confirmar Contraseña:</label>
+                        <input type="password" th:field="*{confirmPassword}" class="form-control" required>
+                        <div th:if="${#fields.hasGlobalErrors()}">
+                             <span th:each="err : ${#fields.globalErrors()}" th:text="${err}" class="error-message"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Rol:</label>
+                        <select th:field="*{rolId}" class="form-control" required>
+                            <option value="">-- Seleccione --</option>
+                            <option th:each="r : ${roles}" th:value="${r.id}" th:text="${r.nombre}"></option>
+                        </select>
+                        <span th:errors="*{rolId}" class="error-message"></span>
+                    </div>
+
+                    <button type="submit">Guardar Usuario</button>
+                    <a th:href="@{/usuarios}" class="btn-cancel">Cancelar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

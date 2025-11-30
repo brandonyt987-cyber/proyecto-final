@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Gestionar Vocero</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    
+    <!-- AGREGADO -->
+    <style>
+        .error-message { color: #dc3545; font-size: 0.875em; margin-top: 5px; display: block; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{dashboard :: sidebar}"></div>
+    <div class="main-content">
+        <header th:replace="~{dashboard :: header-top}"></header>
+
+        <div class="dashboard-area">
+            <div class="form-container" style="margin:0 auto; max-width: 900px;">
+                <h2>Gestionar / Reemplazar Vocero</h2>
+                
+                <div th:if="${error}" class="alert-error-global"><span th:text="${error}"></span></div>
+                <div th:if="${exitoBusqueda}" class="alert-success-global"><span th:text="${exitoBusqueda}"></span></div>
+
+                <div style="padding: 20px;">
+                    
+                    <div style="background-color: #fff8e1; padding: 20px; border-left: 5px solid #f39c12; border-radius: 4px; margin-bottom: 30px; border:1px solid #f0e0c0;">
+                        <h3 style="margin-top:0; color:#d35400; font-size: 1.1rem; border-bottom: 1px solid #f5c6cb; padding-bottom: 10px; margin-bottom: 15px;">
+                            Vocero Seleccionado
+                        </h3>
+                        <div class="row" style="display:flex; gap: 30px; flex-wrap: wrap;">
+                            <div style="flex:1;">
+                                <p style="margin-bottom:5px;"><strong>Nombre:</strong> <br> <span th:text="${aprendiz.nombreCompleto}"></span></p>
+                                <p style="margin-bottom:5px;"><strong>Documento:</strong> <br> <span th:text="${aprendiz.tipoDocumento} + ' ' + ${aprendiz.numeroDocumento}"></span></p>
+                                <p style="margin-bottom:5px;"><strong>Correo:</strong> <br> <span th:text="${aprendiz.correo}"></span></p>
+                            </div>
+                            <div style="flex:1; border-left: 1px solid #e0d0b0; padding-left: 20px;">
+                                <p style="margin-bottom:5px;"><strong>Ficha:</strong> <br> <span style="font-weight:bold; font-size:1.1em;" th:text="${aprendiz.ficha.codigo}"></span></p>
+                                <p style="margin-bottom:5px;"><strong>Programa:</strong> <br> <span th:text="${aprendiz.ficha.programa}"></span></p>
+                                <p style="margin-bottom:5px;"><strong>Celular:</strong> <br> <span th:text="${aprendiz.celular}"></span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px; padding: 20px; border: 1px dashed #ccc; border-radius: 8px; background-color: #fafafa;">
+                        <label style="display:block; margin-bottom:10px; color:#555; font-weight:bold;">
+                            ¿Desea cambiar el vocero? Busque el reemplazo aquí:
+                        </label>
+                        <form th:action="@{/voceros/editar/buscar-reemplazo}" method="get" style="display:flex; gap:10px; align-items:flex-end;">
+                            <input type="hidden" name="idVocero" th:value="${vocero.id}">
+                            
+                            <div style="flex-grow:1;">
+                                <input type="text" name="documento" class="form-control" placeholder="Digite el documento del nuevo aprendiz..." required>
+                            </div>
+                            
+                            <div>
+                                <button type="submit" class="btn-create" style="height: 42px; padding: 0 25px; white-space: nowrap;">Buscar Nuevo</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
+
+                    <form method="POST" th:action="@{/voceros/actualizar}" th:object="${vocero}" novalidate>
+                        <input type="hidden" th:field="*{id}" />
+                        <input type="hidden" name="aprendiz.id" th:value="${aprendiz.id}" />
+                        
+                        <div class="form-group">
+                            <label style="font-weight:bold; color:#333;">Razón del Cambio / Observaciones:</label>
+                            <textarea th:field="*{razonCambio}" class="form-control" style="height:120px;" placeholder="Describa detalladamente el motivo de la actualización o cambio de vocero..." required></textarea>
+                            
+                            <!-- AGREGADO: MENSAJE DE ERROR -->
+                            <span th:errors="*{razonCambio}" class="error-message"></span>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 30px;">
+                            <button type="submit" style="background-color: #f39c12; color:white; padding: 12px; border:none; border-radius:5px; font-weight:bold; cursor:pointer; font-size:1rem; width:100%;">
+                                Guardar Cambios
+                            </button>
+                            
+                            <a th:href="@{/voceros}" style="text-align:center; background-color: #6c757d; color:white; padding: 12px; border-radius:5px; text-decoration:none; font-weight:bold; width:100%; box-sizing:border-box;">
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Atención Individual</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <style>
+        /* Ajuste para que quepan las nuevas columnas */
+        .table-container { overflow-x: auto; }
+        .crud-table { min-width: 1400px; }
+        
+        /* Columna fija de acciones */
+        .sticky-col {
+            position: sticky;
+            right: 0;
+            background-color: white;
+            border-left: 2px solid #eee;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+        .crud-table thead th.sticky-col {
+            background-color: #0077c9;
+            color: white;
+        }
+        /* Estilo para textos secundarios */
+        .sub-text { display: block; font-size: 0.85em; color: #666; margin-top: 2px; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{dashboard :: sidebar}"></div>
+    <div class="main-content">
+        <header th:replace="~{dashboard :: header-top}"></header>
+
+        <div class="dashboard-area">
+            
+            <div class="actions-header">
+                <h2>Atención Individual</h2>
+                <a th:href="@{/atencion/crear}" class="btn-main btn-create">+ Nueva Atención</a>
+            </div>
+
+            <div th:if="${exito}" class="alert-success-global"><span th:text="${exito}"></span></div>
+
+            <div class="table-container">
+                <table class="crud-table">
+                    <thead>
+                        <tr>
+                            <th class="center" style="width:50px;">ID</th>
+                            <th>Aprendiz / Documento</th>
+                            <th>Ficha / Programa</th> <th>Contacto</th> <th>Categoría</th>
+                            <th>Profesional</th>
+                            <th class="center">Etapa Actual</th>
+                            <th class="center">Estado</th>
+                            <th class="center sticky-col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="a : ${atenciones}">
+                            <td class="center" style="font-weight:bold;" th:text="${a.id}"></td>
+                            
+                            <td>
+                                <strong th:text="${a.aprendiz.nombreCompleto}"></strong>
+                                <span class="sub-text" th:text="${a.aprendiz.tipoDocumento} + ' ' + ${a.aprendiz.numeroDocumento}"></span>
+                            </td>
+                            
+                            <td>
+                                <span class="badge-info" th:text="${a.aprendiz.ficha?.codigo}"></span>
+                                <span class="sub-text" th:text="${#strings.abbreviate(a.aprendiz.ficha?.programa, 30)}"></span>
+                            </td>
+
+                            <td>
+                                <div style="font-size:0.9em;">
+                                    📱 <span th:text="${a.aprendiz.celular}"></span><br>
+                                    📧 <span th:text="${a.aprendiz.correo}"></span>
+                                </div>
+                            </td>
+
+                            <td th:text="${a.categoriaDesercion}"></td>
+                            <td th:text="${a.profesional.nombre}"></td>
+                            
+                            <td class="center">
+                                <span th:if="${a.fechaConsulta3 != null}" style="background:#e8f5e9; color:#2e7d32; padding:3px 8px; border-radius:10px; font-size:0.85em; font-weight:bold;">3ª Cita</span>
+                                <span th:if="${a.fechaConsulta3 == null and a.fechaConsulta2 != null}" style="background:#f3e5f5; color:#7b1fa2; padding:3px 8px; border-radius:10px; font-size:0.85em; font-weight:bold;">2ª Cita</span>
+                                <span th:if="${a.fechaConsulta3 == null and a.fechaConsulta2 == null}" style="background:#e3f2fd; color:#0d47a1; padding:3px 8px; border-radius:10px; font-size:0.85em; font-weight:bold;">1ª Cita</span>
+                            </td>
+
+                            <td class="center">
+                                <span th:if="${a.estadoCaso == 'Abierto'}" style="color:green; font-weight:bold;">Abierto</span>
+                                <span th:if="${a.estadoCaso == 'Cerrado'}" style="color:gray; font-weight:bold;">Cerrado</span>
+                                <span th:if="${a.estadoCaso == 'En Seguimiento'}" style="color:orange; font-weight:bold;">Seguimiento</span>
+                            </td>
+                            
+                            <td class="center sticky-col">
+                                <div class="action-buttons">
+                                    <a th:href="@{/atencion/editar/{id}(id=${a.id})}" class="btn-table-action btn-edit">Ver/Editar</a>
+                                    <a th:href="@{/atencion/eliminar/{id}(id=${a.id})}" class="btn-table-action btn-delete" onclick="return confirm('¿Eliminar registro?')">X</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div th:if="${#lists.isEmpty(atenciones)}" style="text-align:center; padding:20px; color:#777;">
+                    No hay casos registrados.
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

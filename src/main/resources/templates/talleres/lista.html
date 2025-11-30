@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Gestión de Talleres</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <style>
+        .table-container { overflow-x: auto; }
+        .sub-text { display: block; font-size: 0.85em; color: #666; margin-top: 2px; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{dashboard :: sidebar}"></div>
+    <div class="main-content">
+        <header th:replace="~{dashboard :: header-top}"></header>
+
+        <div class="dashboard-area">
+            <div class="actions-header">
+                <h2>Talleres Programados</h2>
+                <a th:href="@{/talleres/crear}" class="btn-main btn-create">+ Programar Taller</a>
+            </div>
+
+            <div th:if="${exito}" class="alert-success-global"><span th:text="${exito}"></span></div>
+
+            <div class="table-container">
+                <table class="crud-table">
+                    <thead>
+                        <tr>
+                            <th class="center" style="width:50px;">ID</th>
+                            <th>Nombre Taller</th>
+                            <th>Ficha / Programa</th>
+                            <th>Profesional</th>
+                            <th>Fecha / Horario</th>
+                            <th class="center">Cupo</th>
+                            <th class="center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="t : ${talleres}">
+                            <td class="center" style="font-weight:bold;" th:text="${t.id}"></td>
+                            <td th:text="${t.nombreTaller}"></td>
+                            <td>
+                                <span class="badge-info" th:text="${t.ficha.codigo}"></span>
+                                <span class="sub-text" th:text="${#strings.abbreviate(t.ficha.programa, 25)}"></span>
+                                <span class="sub-text" style="font-style:italic;" th:text="${t.ficha.jornada}"></span>
+                            </td>
+                            <td th:text="${t.profesional.nombre}"></td>
+                            <td>
+                                <strong th:text="${#temporals.format(t.fecha, 'dd-MM-yyyy')}"></strong>
+                                <span class="sub-text" th:text="${t.horaInicio} + ' - ' + ${t.horaFin}"></span>
+                            </td>
+                            <td class="center" th:text="${t.cupo}"></td>
+                            
+                            <td class="center">
+                                <div class="action-buttons">
+                                    <a th:href="@{/talleres/editar/{id}(id=${t.id})}" class="btn-table-action btn-edit">Editar</a>
+                                    <a th:href="@{/talleres/eliminar/{id}(id=${t.id})}" class="btn-table-action btn-delete" onclick="return confirm('¿Eliminar Taller?')">Eliminar</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

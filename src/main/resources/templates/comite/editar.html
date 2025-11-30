@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Editar Comité</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <style>
+        /* Estilo para asegurar que el mensaje de JS se vea igual al de Spring */
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875em;
+            margin-top: 5px;
+            display: none; /* Oculto por defecto */
+        }
+        .is-invalid {
+            border-color: #dc3545 !important; /* Borde rojo */
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{dashboard :: sidebar}"></div>
+    <div class="main-content">
+        <header th:replace="~{dashboard :: header-top}"></header>
+
+        <div class="dashboard-area">
+            <div class="form-container" style="margin:0 auto; max-width: 950px;">
+                <h2>Editar Comité</h2>
+
+                <div style="background: #f1f8ff; padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 5px solid #0077c9;">
+                    <h4 style="color:#0077c9; margin-top:0; border-bottom: 1px solid #dae0e5; padding-bottom: 10px;">Datos del Aprendiz y Ficha</h4>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; font-size: 0.9em; color: #333;">
+                        <div>
+                            <p><strong>Nombre:</strong> <span th:text="${aprendizEncontrado.nombreCompleto}"></span></p>
+                            <p><strong>Doc:</strong> <span th:text="${aprendizEncontrado.tipoDocumento} + ' ' + ${aprendizEncontrado.numeroDocumento}"></span></p>
+                            <p><strong>Celular:</strong> <span th:text="${aprendizEncontrado.celular}"></span></p>
+                        </div>
+                        <div>
+                            <p><strong>Ficha:</strong> <span th:text="${aprendizEncontrado.ficha?.codigo ?: 'N/A'}"></span></p>
+                            <p><strong>Programa:</strong> <span th:text="${aprendizEncontrado.ficha?.programa ?: 'N/A'}"></span></p>
+                            <p><strong>Jornada:</strong> <span th:text="${aprendizEncontrado.ficha?.jornada ?: 'N/A'}"></span></p>
+                        </div>
+                        <div>
+                            <p><strong>Modalidad:</strong> <span th:text="${aprendizEncontrado.ficha?.modalidad ?: 'N/A'}"></span></p>
+                            <p><strong>Etapa:</strong> <span th:text="${aprendizEncontrado.etapaFormacion}"></span></p>
+                            <p><strong>Coordinación:</strong> <span th:text="${aprendizEncontrado.ficha?.coordinacion?.nombre ?: 'Sin Asignar'}"></span></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div th:if="${error}" class="alert-error-global"><span th:text="${error}"></span></div>
+
+                <form id="formEditarComite" method="POST" th:action="@{/comite/actualizar}" th:object="${comite}" novalidate>
+                    
+                    <input type="hidden" th:field="*{id}">
+                    <input type="hidden" name="aprendizId" th:value="${aprendizEncontrado.id}">
+
+                    <h5 style="color:#666; margin-bottom:15px;">1. Detalles de la Citación</h5>
+                    
+                    <div class="row" style="display:flex; gap:15px;">
+                        <div class="form-group" style="flex:1;">
+                            <label>Fecha del Comité:</label>
+                            <input type="date" id="fechaComite" th:field="*{fecha}" class="form-control" 
+                                   th:min="${minDate}" th:max="${maxDate}" required>
+                            <span th:errors="*{fecha}" class="error-message" style="display:block;"></span>
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label>Hora (9:00 AM - 5:00 PM):</label>
+                            <input type="time" id="horaInput" th:field="*{hora}" class="form-control" required>
+                            
+                            <span id="errorHora" class="error-message"></span>
+                            <span th:errors="*{hora}" class="error-message" style="display:block;"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Lugar o Enlace de Conexión:</label>
+                        <input type="text" th:field="*{enlace}" class="form-control">
+                        <span th:errors="*{enlace}" class="error-message" style="display:block;"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tipo de Falta:</label>
+                        <select th:field="*{tipoFalta}" class="form-control">
+                            <option value="">-- Seleccione --</option>
+                            <option value="Académica">Académica</option>
+                            <option value="Disciplinaria">Disciplinaria</option>
+                            <option value="Académica y Disciplinaria">Académica y Disciplinaria</option>
+                        </select>
+                        <span th:errors="*{tipoFalta}" class="error-message" style="display:block;"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Motivo de Citación:</label>
+                        <textarea th:field="*{motivo}" class="form-control"></textarea>
+                        <span th:errors="*{motivo}" class="error-message" style="display:block;"></span>
+                    </div>
+
+                    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+                    <h5 style="color:#666; margin-bottom:15px;">2. Asistentes y Responsables</h5>
+
+                    <div class="form-group">
+                        <label>Profesional de Bienestar (Asistente):</label>
+                        <select th:field="*{profesionalBienestar}" class="form-control">
+                            <option value="">-- Seleccione Profesional --</option>
+                            <option th:each="pro : ${listaProfesionales}" 
+                                    th:value="${pro.nombre}" 
+                                    th:text="${pro.nombre} + ' (' + ${pro.rol} + ')'"></option>
+                        </select>
+                        <span th:errors="*{profesionalBienestar}" class="error-message" style="display:block;"></span>
+                    </div>
+
+                    <div class="row" style="display:flex; gap:15px;">
+                        <div class="form-group" style="flex:1;">
+                            <label>Representante de Aprendices:</label>
+                            <input type="text" th:field="*{representanteAprendices}" class="form-control" readonly style="background-color:#e9ecef;">
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label>Instructor a Cargo:</label>
+                            <select th:field="*{instructor}" class="form-control">
+                                <option value="">-- Seleccione Instructor --</option>
+                                <option th:each="inst : ${listaInstructores}" 
+                                        th:value="${inst.id}" 
+                                        th:text="${inst.nombreCompleto}"
+                                        th:selected="${inst.id == comite.instructor.id}"></option>
+                            </select>
+                            <span th:errors="*{instructor}" class="error-message" style="display:block;"></span>
+                        </div>
+                    </div>
+
+                    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+                    <h5 style="color:#666; margin-bottom:15px;">3. Resultados y Compromisos</h5>
+
+                    <div class="form-group">
+                        <label>Recomendación a Subdirección:</label>
+                        <textarea th:field="*{recomendacion}" class="form-control"></textarea>
+                        <span th:errors="*{recomendacion}" class="error-message" style="display:block;"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Plan de Mejoramiento (Descripción):</label>
+                        <textarea th:field="*{planMejoramiento}" class="form-control"></textarea>
+                        <span th:errors="*{planMejoramiento}" class="error-message" style="display:block;"></span>
+                    </div>
+
+                    <div class="row" style="display:flex; gap:15px;">
+                        <div class="form-group" style="flex:1;">
+                            <label>Fecha Plazo Cumplimiento:</label>
+                            <input type="date" th:field="*{fechaPlazo}" class="form-control"
+                                   th:min="${minDatePlazo}" th:max="${maxDatePlazo}">
+                            <span th:errors="*{fechaPlazo}" class="error-message" style="display:block;"></span>
+                        </div>
+                        
+                        <div class="form-group" style="flex:1;">
+                            <label>¿Se entrega Paz y Salvo?</label>
+                            <select th:field="*{pazSalvo}" class="form-control">
+                                <option value="false">NO</option>
+                                <option value="true">SÍ</option>
+                            </select>
+                            <span th:errors="*{pazSalvo}" class="error-message" style="display:block;"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Observaciones:</label>
+                        <textarea th:field="*{observaciones}" class="form-control"></textarea>
+                        <span th:errors="*{observaciones}" class="error-message" style="display:block;"></span>
+                    </div>
+
+                    <button type="submit" class="btn-main btn-create" style="width:100%; display:block; text-align:center;">Actualizar Comité</button>
+                    <a th:href="@{/comite}" class="btn-cancel" style="margin-top:10px; display:block; text-align:center;">Cancelar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. VALIDACIÓN VISUAL DE HORA (Sin Alert)
+        document.getElementById('formEditarComite').addEventListener('submit', function(e) {
+            var horaInput = document.getElementById('horaInput');
+            var errorSpan = document.getElementById('errorHora');
+            var horaValue = horaInput.value;
+            
+            // Limpiar estado anterior
+            errorSpan.style.display = 'none';
+            errorSpan.textContent = '';
+            horaInput.classList.remove('is-invalid');
+
+            if (!horaValue) {
+                e.preventDefault();
+                errorSpan.textContent = 'La hora es obligatoria.';
+                errorSpan.style.display = 'block';
+                horaInput.classList.add('is-invalid');
+                return;
+            }
+
+            var partes = horaValue.split(':');
+            var horas = parseInt(partes[0]);
+            var minutos = parseInt(partes[1]);
+            
+            // Validar rango 9:00 AM - 5:00 PM (17:00)
+            if (horas < 9 || horas >= 17 || (horas === 17 && minutos > 0)) {
+                e.preventDefault(); // Detener envío
+                errorSpan.textContent = 'Horario no permitido (9:00 AM - 5:00 PM).'; // Mensaje texto rojo
+                errorSpan.style.display = 'block'; // Mostrar mensaje
+                horaInput.classList.add('is-invalid'); // Poner borde rojo al input
+            }
+        });
+
+        // 2. Cálculo de fecha plazo (Existente)
+        document.getElementById('fechaComite').addEventListener('change', function() {
+            let fechaInput = this.value;
+            if (fechaInput) {
+                let fecha = new Date(fechaInput + 'T00:00:00');
+                fecha.setDate(fecha.getDate() + 20);
+                let diaSemana = fecha.getDay();
+                if (diaSemana === 6) fecha.setDate(fecha.getDate() + 2);
+                else if (diaSemana === 0) fecha.setDate(fecha.getDate() + 1);
+                
+                let year = fecha.getFullYear();
+                let month = ('0' + (fecha.getMonth() + 1)).slice(-2);
+                let day = ('0' + fecha.getDate()).slice(-2);
+                
+                // Solo sugerir si está vacío (opcional, o puedes forzarlo siempre)
+                var campoPlazo = document.getElementById('fechaPlazo');
+                if(!campoPlazo.value){
+                    campoPlazo.value = `${year}-${month}-${day}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

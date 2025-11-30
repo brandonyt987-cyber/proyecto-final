@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Editar Instructor</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+    <div th:replace="~{dashboard :: sidebar}"></div>
+    <div class="main-content">
+        <header th:replace="~{dashboard :: header-top}"></header>
+
+        <div class="dashboard-area">
+            <div class="form-container" style="margin:0 auto; max-width: 800px;">
+                <h2>Editar Instructor</h2>
+                <div th:if="${error}" class="alert-error-global"><span th:text="${error}"></span></div>
+
+                <form method="POST" th:action="@{/instructores/actualizar}" th:object="${instructor}" novalidate>
+                    <input type="hidden" th:field="*{id}">
+                    
+                    <div class="row" style="display:flex; gap:15px;">
+                        <div class="form-group" style="flex:1;">
+                            <label>Nombres:</label>
+                            <input type="text" th:field="*{nombres}" class="form-control">
+                            <span th:errors="*{nombres}" class="error-message"></span>
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label>Apellidos:</label>
+                            <input type="text" th:field="*{apellidos}" class="form-control">
+                            <span th:errors="*{apellidos}" class="error-message"></span>
+                        </div>
+                    </div>
+
+                    <div class="row" style="display:flex; gap:15px;">
+                        <div class="form-group" style="flex:1;">
+                            <label>Tipo Doc:</label>
+                            <select th:field="*{tipoDocumento}" class="form-control">
+                                <option value="CC">Cédula de Ciudadanía</option>
+                                <option value="CE">Cédula de Extranjería</option>
+                                <option value="PEP">PEP</option>
+                            </select>
+                            <span th:errors="*{tipoDocumento}" class="error-message"></span>
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label>Número Documento:</label>
+                            <input type="text" th:field="*{numeroDocumento}" class="form-control" placeholder="Sin puntos ni espacios">
+                            <span th:errors="*{numeroDocumento}" class="error-message"></span>
+                        </div>
+                    </div>
+
+                    <div class="row" style="display:flex; gap:15px;">
+                        <div class="form-group" style="flex:1;">
+                            <label>Profesión:</label>
+                            <input type="text" th:field="*{profesion}" class="form-control">
+                            <span th:errors="*{profesion}" class="error-message"></span>
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label>Teléfono de Contacto:</label>
+                            <input type="text" th:field="*{telefono}" class="form-control">
+                            <span th:errors="*{telefono}" class="error-message"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="row" style="display:flex; gap:15px;">
+                        <div class="form-group" style="flex:1;">
+                            <label>Correo Electrónico:</label>
+                            <input type="email" th:field="*{correo}" class="form-control">
+                            <span th:errors="*{correo}" class="error-message"></span>
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label>Asignar a Coordinación:</label>
+                            <select th:field="*{coordinacion}" class="form-control">
+                                <option value="">-- Seleccione Coordinación --</option>
+                                <option th:each="c : ${coordinaciones}" 
+                                        th:value="${c.id}" 
+                                        th:text="${c.nombre}"
+                                        th:selected="${c.id == instructor.coordinacion.id}">
+                                </option>
+                            </select>
+                            <span th:errors="*{coordinacion}" class="error-message"></span>
+                        </div>
+                    </div>
+
+                    <button type="submit" style="background-color: #f39c12;">Actualizar Instructor</button>
+                    <a th:href="@{/instructores}" class="btn-cancel">Cancelar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

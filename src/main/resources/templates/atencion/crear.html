@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Nueva Atención</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <style>
+        .error-message { color: #dc3545; font-size: 0.85em; margin-top: 5px; display: block; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{dashboard :: sidebar}"></div>
+    <div class="main-content">
+        <header th:replace="~{dashboard :: header-top}"></header>
+
+        <div class="dashboard-area">
+            <div class="form-container" style="margin:0 auto; max-width: 950px;">
+                <h2>Registro de Atención Individual</h2>
+
+                <form method="GET" th:action="@{/atencion/crear}" style="margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px;">
+                    <label>Buscar Aprendiz por Documento:</label>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" name="documento" class="form-control" th:value="${busqueda}" placeholder="Ej: 1028987878" required>
+                        <button type="submit" class="btn-main btn-create" style="margin:0;">Buscar</button>
+                    </div>
+                    <div th:if="${errorBusqueda}" class="alert-error-global" style="margin-top:10px;">
+                        <span th:text="${errorBusqueda}"></span>
+                    </div>
+                </form>
+
+                <div th:if="${aprendizEncontrado}">
+                    
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #e9ecef;">
+                        <h4 style="color:#0077c9; margin:0 0 15px 0; border-bottom: 2px solid #0077c9; padding-bottom: 10px; display:inline-block;">
+                            Datos del Aprendiz
+                        </h4>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; font-size: 0.9em; color: #333;">
+                            <div>
+                                <p style="margin-bottom:8px;"><strong>Nombre:</strong> <br> <span th:text="${aprendizEncontrado.nombreCompleto}"></span></p>
+                                <p style="margin-bottom:8px;"><strong>Documento:</strong> <br> <span th:text="${aprendizEncontrado.tipoDocumento} + ' ' + ${aprendizEncontrado.numeroDocumento}"></span></p>
+                                <p><strong>Edad:</strong> <br> <span class="badge-info" id="edadBadge" th:text="${aprendizEncontrado.edad} + ' Años'"></span></p>
+                                <input type="hidden" id="edadAprendiz" th:value="${aprendizEncontrado.edad}">
+                            </div>
+                            
+                            <div style="border-left: 1px solid #ddd; padding-left: 15px;">
+                                <p style="margin-bottom:8px;"><strong>Ficha:</strong> <br> <span style="font-weight:bold; color:#0077c9;" th:text="${aprendizEncontrado.ficha?.codigo}"></span></p>
+                                <p style="margin-bottom:8px;"><strong>Programa:</strong> <br> <span th:text="${aprendizEncontrado.ficha?.programa}"></span></p>
+                                <p><strong>Coordinación:</strong> <br> <span th:text="${aprendizEncontrado.ficha?.coordinacion?.nombre ?: 'Sin Asignar'}"></span></p>
+                            </div>
+
+                            <div style="border-left: 1px solid #ddd; padding-left: 15px;">
+                                <p style="margin-bottom:8px;"><strong>Jornada/Mod:</strong> <br> <span th:text="${aprendizEncontrado.ficha?.jornada} + ' - ' + ${aprendizEncontrado.ficha?.modalidad}"></span></p>
+                                <p><strong>Contacto:</strong> <br> 
+                                    📱 <span th:text="${aprendizEncontrado.celular}"></span> <br> 
+                                    📧 <span th:text="${aprendizEncontrado.correo}"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div th:if="${error}" class="alert-error-global"><span th:text="${error}"></span></div>
+
+                    <form method="POST" th:action="@{/atencion/guardar}" th:object="${atencion}" novalidate>
+                        <input type="hidden" name="aprendizId" th:value="${aprendizEncontrado.id}">
+
+                        <div class="form-group">
+                            <label>Profesional a Cargo:</label>
+                            <select th:field="*{profesional.id}" class="form-control" required>
+                                <option value="">-- Seleccione Profesional --</option>
+                                <option th:each="pro : ${listaProfesionales}" 
+                                        th:value="${pro.id}" 
+                                        th:text="${pro.nombre} + ' (' + ${pro.rol} + ')'"></option>
+                            </select>
+                            <span th:errors="*{profesional.id}" class="error-message"></span>
+                        </div>
+
+                        <div class="row" style="display:flex; gap:15px;">
+                            <div class="form-group" style="flex:1;">
+                                <label>Categoría Deserción:</label>
+                                <select th:field="*{categoriaDesercion}" class="form-control" required>
+                                    <option value="">-- Seleccione --</option>
+                                    <option value="Riesgo Académico">Riesgo Académico</option>
+                                    <option value="Riesgo Económico">Riesgo Económico</option>
+                                    <option value="Problemas de Salud">Problemas de Salud</option>
+                                    <option value="Adaptación">Adaptación</option>
+                                    <option value="Personal/Familiar">Personal/Familiar</option>
+                                </select>
+                                <span th:errors="*{categoriaDesercion}" class="error-message"></span>
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label>Estado del Caso:</label>
+                                <select th:field="*{estadoCaso}" class="form-control" required>
+                                    <option value="Abierto">Abierto</option>
+                                    <option value="En Seguimiento">En Seguimiento</option>
+                                    <option value="Cerrado">Cerrado</option>
+                                </select>
+                                <span th:errors="*{estadoCaso}" class="error-message"></span>
+                            </div>
+                        </div>
+
+                        <div class="row" style="display:flex; gap:15px;">
+                            <div class="form-group" style="flex:1;">
+                                <label>Remitido Por:</label>
+                                <input type="text" th:field="*{remitidoPor}" class="form-control" required>
+                                <span th:errors="*{remitidoPor}" class="error-message"></span>
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label>Atención Familiar (Solo Menores de Edad):</label>
+                                <input type="text" id="atencionFamiliar" th:field="*{atencionFamiliar}" class="form-control" placeholder="Parentesco">
+                            </div>
+                        </div>
+
+                        <div style="background:#e3f2fd; padding:15px; border-radius:5px; margin-top:20px;">
+                            <h5 style="margin:0 0 10px 0; color:#0d47a1;">1ª Consulta</h5>
+                            <div class="row" style="display:flex; gap:15px;">
+                                <div class="form-group" style="width:200px;">
+                                    <label>Fecha:</label>
+                                    <input type="date" th:field="*{fechaConsulta1}" class="form-control" th:min="${minDate}">
+                                </div>
+                                <div class="form-group" style="flex:1;">
+                                    <label>Observaciones:</label>
+                                    <textarea th:field="*{observaciones1}" class="form-control" style="height:60px;"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="background:#f3e5f5; padding:15px; border-radius:5px; margin-top:15px;">
+                            <h5 style="margin:0 0 10px 0; color:#7b1fa2;">2ª Consulta</h5>
+                            <div class="row" style="display:flex; gap:15px;">
+                                <div class="form-group" style="width:200px;">
+                                    <label>Fecha:</label>
+                                    <input type="date" th:field="*{fechaConsulta2}" class="form-control" th:min="${minDate}">
+                                </div>
+                                <div class="form-group" style="flex:1;">
+                                    <label>Observaciones:</label>
+                                    <textarea th:field="*{observaciones2}" class="form-control" style="height:60px;"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background:#e8f5e9; padding:15px; border-radius:5px; margin-top:15px;">
+                            <h5 style="margin:0 0 10px 0; color:#2e7d32;">3ª Consulta</h5>
+                            <div class="row" style="display:flex; gap:15px;">
+                                <div class="form-group" style="width:200px;">
+                                    <label>Fecha:</label>
+                                    <input type="date" th:field="*{fechaConsulta3}" class="form-control" th:min="${minDate}">
+                                </div>
+                                <div class="form-group" style="flex:1;">
+                                    <label>Observaciones:</label>
+                                    <textarea th:field="*{observaciones3}" class="form-control" style="height:60px;"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top:30px; display:flex; flex-direction:column; gap:15px; align-items:center;">
+                            <button type="submit" class="btn-main btn-create" style="cursor:pointer; width:100%; max-width:300px; text-align:center; justify-content:center;">
+                                Guardar Atención
+                            </button>
+                            
+                            <a th:href="@{/atencion}" style="padding: 10px 20px; background-color: #6c757d; color: white; border-radius: 5px; text-decoration: none; font-weight: bold; width:100%; max-width:300px; text-align:center; box-sizing:border-box;">
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var edad = document.getElementById("edadAprendiz");
+            var inputFamiliar = document.getElementById("atencionFamiliar");
+            
+            if (edad && inputFamiliar) {
+                var edadNum = parseInt(edad.value);
+                if (edadNum >= 18) {
+                    inputFamiliar.disabled = true;
+                    inputFamiliar.placeholder = "No aplica (Mayor de edad)";
+                    inputFamiliar.style.backgroundColor = "#e9ecef";
+                }
+            }
+        });
+    </script>
+</body>
+</html>

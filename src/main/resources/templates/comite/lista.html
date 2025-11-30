@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Comités de Evaluación</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    
+    <style>
+        .crud-table {
+            min-width: 1600px; /* Tabla ancha con scroll */
+        }
+        .crud-table th:last-child, 
+        .crud-table td:last-child {
+            position: sticky;
+            right: 0;
+            background-color: white; 
+            border-left: 1px solid #eee;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.05);
+        }
+        .crud-table thead th:last-child {
+            background-color: #0077c9; 
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    
+    <div th:replace="~{dashboard :: sidebar}"></div>
+    
+    <div class="main-content">
+        <header th:replace="~{dashboard :: header-top}"></header>
+
+        <div class="dashboard-area">
+            
+            <div class="actions-header">
+                <h2>Comités de Evaluación</h2>
+                <a th:href="@{/comite/crear}" class="btn-main btn-create">+ Nuevo Comité</a>
+            </div>
+
+            <div th:if="${exito}" class="alert-success-global"><span th:text="${exito}"></span></div>
+
+            <div class="table-container">
+                <table class="crud-table">
+                    <thead>
+                        <tr>
+                            <th class="center" style="width: 50px;">ID</th>
+                            <th>Fecha</th>
+                            <th>Aprendiz</th>
+                            <th>Ficha</th>
+                            
+                            <th>Coordinación</th>
+                            <th>Instructor</th>
+                            
+                            <th>Falta</th>
+                            <th>Motivo</th>
+                            <th>Recomendación</th>
+                            <th>Plan Mejoramiento</th>
+                            <th>Fecha Plazo</th>
+                            <th class="center">Paz y Salvo</th>
+                            
+                            <th class="center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="c : ${comites}">
+                            
+                            <td class="center" style="font-weight:bold;" th:text="${c.id}"></td>
+                            <td th:text="${c.fecha}"></td>
+                            <td th:text="${c.aprendiz?.nombreCompleto ?: '---'}"></td>
+                            
+                            <td>
+                                <span class="badge-info" th:text="${c.aprendiz?.ficha?.codigo ?: 'N/A'}"></span>
+                            </td>
+                            
+                            <td th:text="${c.coordinacion.nombre}"></td>
+                            <td th:text="${c.instructor.nombreCompleto}"></td>
+                            
+                            <td th:text="${c.tipoFalta}"></td>
+                            <td th:text="${#strings.abbreviate(c.motivo, 20)}"></td>
+                            <td th:text="${#strings.abbreviate(c.recomendacion, 20)}"></td>
+                            <td th:text="${#strings.abbreviate(c.planMejoramiento, 20)}"></td>
+                            <td th:text="${c.fechaPlazo}"></td>
+                            
+                            <td class="center">
+                                <span th:if="${c.pazSalvo}" style="color:green; font-weight:bold;">SÍ</span>
+                                <span th:unless="${c.pazSalvo}" style="color:red;">NO</span>
+                            </td>
+                            
+                            <td class="center">
+                                <div class="action-buttons">
+                                    <a th:href="@{/comite/editar/{id}(id=${c.id})}" 
+                                       class="btn-table-action btn-edit">Editar</a>
+                                       
+                                    <div sec:authorize="hasRole('ADMIN')" style="display:inline;">
+                                        <a th:href="@{/comite/eliminar/{id}(id=${c.id})}" 
+                                           class="btn-table-action btn-delete"
+                                           onclick="return confirm('¿Eliminar registro?')">Eliminar</a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div th:if="${#lists.isEmpty(comites)}" style="text-align:center; padding:30px; color:#666;">
+                    No hay comités registrados.
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Nuevo Comité</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+    
+    <div th:replace="~{dashboard :: sidebar}"></div>
+    
+    <div class="main-content">
+        <header th:replace="~{dashboard :: header-top}"></header>
+
+        <div class="dashboard-area">
+            <div class="form-container" style="margin:0 auto; max-width: 950px;">
+                <h2>Registro de Comité</h2>
+
+                <form method="GET" th:action="@{/comite/crear}" style="margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px;">
+                    <label>Buscar Aprendiz por Documento:</label>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" name="documento" class="form-control" th:value="${busqueda}" placeholder="Ej: 1028987878" required>
+                        <button type="submit" class="btn-main btn-create" style="margin:0;">Buscar</button>
+                    </div>
+                    <div th:if="${errorBusqueda}" class="alert-error-global" style="margin-top:10px;">
+                        <span th:text="${errorBusqueda}"></span>
+                    </div>
+                </form>
+
+                <div th:if="${aprendizEncontrado}">
+                    
+                    <div style="background: #f1f8ff; padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 5px solid #0077c9;">
+                        <h4 style="color:#0077c9; margin-top:0; border-bottom: 1px solid #dae0e5; padding-bottom: 10px;">Datos del Aprendiz y Ficha</h4>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; font-size: 0.9em; color: #333;">
+                            <div>
+                                <p><strong>Nombre:</strong> <span th:text="${aprendizEncontrado.nombreCompleto}"></span></p>
+                                <p><strong>Doc:</strong> <span th:text="${aprendizEncontrado.tipoDocumento} + ' ' + ${aprendizEncontrado.numeroDocumento}"></span></p>
+                                <p><strong>Celular:</strong> <span th:text="${aprendizEncontrado.celular}"></span></p>
+                            </div>
+                            <div>
+                                <p><strong>Ficha:</strong> <span th:text="${aprendizEncontrado.ficha?.codigo ?: 'N/A'}"></span></p>
+                                <p><strong>Programa:</strong> <span th:text="${aprendizEncontrado.ficha?.programa ?: 'N/A'}"></span></p>
+                                <p><strong>Jornada:</strong> <span th:text="${aprendizEncontrado.ficha?.jornada ?: 'N/A'}"></span></p>
+                            </div>
+                            <div>
+                                <p><strong>Modalidad:</strong> <span th:text="${aprendizEncontrado.ficha?.modalidad ?: 'N/A'}"></span></p>
+                                <p><strong>Etapa:</strong> <span th:text="${aprendizEncontrado.etapaFormacion}"></span></p>
+                                <p><strong>Coordinación:</strong> <span th:text="${aprendizEncontrado.ficha?.coordinacion?.nombre ?: 'Sin Asignar'}"></span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div th:if="${error}" class="alert-error-global"><span th:text="${error}"></span></div>
+
+                    <form method="POST" th:action="@{/comite/guardar}" th:object="${comite}" novalidate>
+                        <input type="hidden" name="aprendizId" th:value="${aprendizEncontrado.id}">
+
+                        <h5 style="color:#666;">1. Detalles de la Citación</h5>
+                        
+                        <div class="row" style="display:flex; gap:15px;">
+                            <div class="form-group" style="flex:1;">
+                                <label>Fecha del Comité (Día 1-20):</label>
+                                <input type="date" th:field="*{fecha}" class="form-control" 
+                                       th:min="${minDate}" th:max="${maxDate}" required>
+                                <span th:errors="*{fecha}" class="error-message"></span>
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label>Hora (9am - 5pm):</label>
+                                <input type="time" th:field="*{hora}" class="form-control" min="09:00" max="17:00">
+                                <span th:errors="*{hora}" class="error-message"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Lugar o Enlace de Conexión:</label>
+                            <input type="text" th:field="*{enlace}" class="form-control">
+                            <span th:errors="*{enlace}" class="error-message"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tipo de Falta:</label>
+                            <select th:field="*{tipoFalta}" class="form-control">
+                                <option value="">-- Seleccione --</option>
+                                <option value="Académica">Académica</option>
+                                <option value="Disciplinaria">Disciplinaria</option>
+                                <option value="Académica y Disciplinaria">Académica y Disciplinaria</option>
+                            </select>
+                            <span th:errors="*{tipoFalta}" class="error-message"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Motivo de Citación:</label>
+                            <textarea th:field="*{motivo}" class="form-control" placeholder="Describa el motivo..."></textarea>
+                            <span th:errors="*{motivo}" class="error-message"></span>
+                        </div>
+
+                        <hr>
+                        <h5 style="color:#666;">2. Asistentes y Responsables</h5>
+
+                        <div class="form-group">
+                            <label>Profesional de Bienestar (Asistente):</label>
+                            <select th:field="*{profesionalBienestar}" class="form-control">
+                                <option value="">-- Seleccione Profesional --</option>
+                                <option th:each="p : ${listaProfesionales}" th:value="${p.nombre}" th:text="${p.nombre} + ' (' + ${p.rol} + ')'"></option>
+                            </select>
+                            <span th:errors="*{profesionalBienestar}" class="error-message"></span>
+                        </div>
+
+                        <div class="row" style="display:flex; gap:15px;">
+                            <div class="form-group" style="flex:1;">
+                                <label>Representante Aprendices (Automático):</label>
+                                <input type="text" th:field="*{representanteAprendices}" class="form-control" readonly style="background-color:#e9ecef;">
+                                <span th:errors="*{representanteAprendices}" class="error-message"></span>
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label>Instructor a Cargo:</label>
+                                <select th:field="*{instructor}" class="form-control">
+                                    <option value="">-- Seleccione Instructor --</option>
+                                    <option th:each="inst : ${listaInstructores}" th:value="${inst.id}" th:text="${inst.nombreCompleto}"></option>
+                                </select>
+                                <span th:errors="*{instructor}" class="error-message"></span>
+                            </div>
+                        </div>
+
+                        <hr>
+                        <h5 style="color:#666;">3. Resultados y Compromisos</h5>
+
+                        <div class="form-group">
+                            <label>Recomendación a Subdirección:</label>
+                            <textarea th:field="*{recomendacion}" class="form-control" placeholder="N/A"></textarea>
+                            <span th:errors="*{recomendacion}" class="error-message"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Plan de Mejoramiento (Descripción):</label>
+                            <textarea th:field="*{planMejoramiento}" class="form-control" placeholder="N/A"></textarea>
+                            <span th:errors="*{planMejoramiento}" class="error-message"></span>
+                        </div>
+
+                        <div class="row" style="display:flex; gap:15px;">
+                            <div class="form-group" style="flex:1;">
+                                <label>Fecha Plazo Cumplimiento:</label>
+                                <input type="date" th:field="*{fechaPlazo}" class="form-control"
+                                       th:min="${minDatePlazo}" th:max="${maxDatePlazo}">
+                                <small class="text-muted">Seleccione una fecha (Máximo 1 mes).</small>
+                                <span th:errors="*{fechaPlazo}" class="error-message"></span>
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label>¿Se entrega Paz y Salvo?</label>
+                                <select th:field="*{pazSalvo}" class="form-control">
+                                    <option value="">-- Seleccione --</option>
+                                    <option value="false">NO</option>
+                                    <option value="true">SÍ</option>
+                                </select>
+                                <span th:errors="*{pazSalvo}" class="error-message"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Observaciones:</label>
+                            <textarea th:field="*{observaciones}" class="form-control" placeholder="N/A"></textarea>
+                            <span th:errors="*{observaciones}" class="error-message"></span>
+                        </div>
+
+                        <button type="submit" class="btn-main btn-create" style="width:100%; display:block; text-align:center;">Registrar Comité</button>
+                        <a th:href="@{/comite}" class="btn-cancel" style="margin-top:10px; display:block; text-align:center;">Cancelar</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

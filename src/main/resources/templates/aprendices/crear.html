@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Nuevo Aprendiz</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+    <div th:replace="~{dashboard :: sidebar}"></div>
+    <div class="main-content">
+        <header th:replace="~{dashboard :: header-top}"></header>
+
+        <div class="dashboard-area">
+            <div class="form-container" style="margin:0 auto; max-width: 800px;">
+                <h2>Registrar Aprendiz</h2>
+                <div th:if="${error}" class="alert-error-global"><span th:text="${error}"></span></div>
+
+                <form method="POST" th:action="@{/aprendices/guardar}" th:object="${aprendiz}" novalidate>
+                    
+                    <div class="row" style="display:flex; gap:15px;">
+                        <div class="form-group" style="flex:1;">
+                            <label>Nombres:</label>
+                            <input type="text" th:field="*{nombres}" class="form-control" placeholder="Nombres">
+                            <span th:errors="*{nombres}" class="error-message"></span>
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label>Apellidos:</label>
+                            <input type="text" th:field="*{apellidos}" class="form-control" placeholder="Apellidos">
+                            <span th:errors="*{apellidos}" class="error-message"></span>
+                        </div>
+                    </div>
+
+                    <div class="row" style="display:flex; gap:15px;">
+                        <div class="form-group" style="flex:1;">
+                            <label>Tipo Doc:</label>
+                            <select th:field="*{tipoDocumento}" class="form-control">
+                                <option value="">-- Seleccione --</option>
+                                <option value="CC">Cédula de Ciudadanía</option>
+                                <option value="TI">Tarjeta de Identidad</option>
+                                <option value="CE">Cédula de Extranjería</option>
+                                <option value="PEP">PEP</option>
+                            </select>
+                            <span th:errors="*{tipoDocumento}" class="error-message"></span>
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label>Número Documento:</label>
+                            <input type="text" th:field="*{numeroDocumento}" class="form-control" placeholder="Sin puntos">
+                            <span th:errors="*{numeroDocumento}" class="error-message"></span>
+                        </div>
+                    </div>
+
+                    <div class="row" style="display:flex; gap:15px;">
+                        <div class="form-group" style="flex:1;">
+                            <label>Fecha de Nacimiento (+16 Años):</label>
+                            <input type="date" th:field="*{fechaNacimiento}" th:max="${maxDate}" class="form-control" required>
+                            <span th:errors="*{fechaNacimiento}" class="error-message"></span>
+                        </div>
+                        
+                        <div class="form-group" style="flex:1;">
+                            <label>Asignar a Ficha:</label>
+                            <select th:field="*{ficha}" class="form-control">
+                                <option value="">-- Seleccione Ficha --</option>
+                                <option th:each="f : ${fichas}" 
+                                        th:value="${f.id}" 
+                                        th:text="${f.codigo} + ' - ' + ${f.programa}">
+                                </option>
+                            </select>
+                            <span th:errors="*{ficha}" class="error-message"></span>
+                        </div>
+                    </div>
+
+                    <div class="row" style="display:flex; gap:15px;">
+                        <div class="form-group" style="flex:1;">
+                            <label>Correo Electrónico:</label>
+                            <input type="email" th:field="*{correo}" class="form-control">
+                            <span th:errors="*{correo}" class="error-message"></span>
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label>Celular:</label>
+                            <input type="text" th:field="*{celular}" class="form-control">
+                            <span th:errors="*{celular}" class="error-message"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Etapa de Formación:</label>
+                        <select th:field="*{etapaFormacion}" class="form-control">
+                            <option value="">-- Seleccione --</option>
+                            <option value="Lectiva">Lectiva</option>
+                            <option value="Productiva">Productiva</option>
+                        </select>
+                        <span th:errors="*{etapaFormacion}" class="error-message"></span>
+                    </div>
+
+                    <button type="submit">Guardar Aprendiz</button>
+                    <a th:href="@{/aprendices}" class="btn-cancel">Cancelar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

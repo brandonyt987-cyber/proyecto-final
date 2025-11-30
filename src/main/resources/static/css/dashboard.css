@@ -1,0 +1,281 @@
+/* =========================================
+   1. ESTILOS BASE Y LAYOUT GENERAL
+========================================= */
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* =========================================
+   2. SIDEBAR (LATERAL IZQUIERDO FIJO)
+========================================= */
+.sidebar {
+    width: 250px;
+    background-color: #0077c9;
+    color: white;
+    padding: 20px 0;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow-y: auto;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.sidebar h3 {
+    text-align: center;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 1.2rem;
+    color: white;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    padding-bottom: 40px; /* Espacio final extra */
+}
+
+.sidebar ul li a {
+    display: block;
+    padding: 15px 20px;
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+    border-left: 4px solid transparent;
+    transition: background-color 0.3s, border-left 0.3s;
+}
+
+.sidebar ul li a:hover,
+.sidebar ul li.active a {
+    background-color: #0060a0;
+    border-left: 4px solid #1abc9c;
+}
+
+/* =========================================
+   3. CONTENIDO PRINCIPAL (A LA DERECHA)
+========================================= */
+.main-content {
+    margin-left: 250px;
+    width: calc(100% - 250px);
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* =========================================
+   4. HEADER SUPERIOR
+========================================= */
+.header-top {
+    background-color: white;
+    padding: 10px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 120px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.header-image-container {
+    flex-grow: 1;
+    max-width: 75%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.header-dashboard-image {
+    width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: center;
+}
+
+.user-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    min-width: 150px;
+}
+
+.user-info {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.btn-logout {
+    background: none;
+    border: 1px solid #d9534f;
+    border-radius: 4px;
+    color: #d9534f;
+    cursor: pointer;
+    padding: 5px 10px;
+    font-weight: 600;
+}
+
+.btn-logout:hover {
+    background: #d9534f;
+    color: white;
+}
+
+.dashboard-area {
+    padding: 30px;
+    flex-grow: 1;
+}
+
+/* =========================================
+   5. TARJETAS / MÉTRICAS
+========================================= */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.stat-card {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    border-top: 4px solid #1abc9c;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.stat-card h4 {
+    margin: 0 0 10px 0;
+    color: #0077c9;
+}
+
+.stat-card .value {
+    margin: 0;
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #333;
+}
+
+/* =========================================
+   6. TABLAS CRUD
+========================================= */
+.actions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.btn-main {
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: white;
+}
+
+.btn-create { background: #1abc9c; }
+.btn-create:hover { background: #16a085; }
+
+.btn-import { background: #27ae60; margin-right: 10px; }
+.btn-import:hover { background: #219150; }
+
+.table-container {
+    width: 100%;
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    overflow-x: auto;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.crud-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    white-space: nowrap;
+}
+
+.crud-table thead {
+    background: #0077c9;
+    color: white;
+}
+
+.crud-table th {
+    padding: 15px;
+    text-align: left;
+}
+
+.crud-table td {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.crud-table .center {
+    text-align: center;
+}
+
+/* Botones de acción */
+.action-buttons {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+
+.btn-table-action {
+    padding: 5px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.85em;
+    color: white !important;
+    font-weight: 600;
+}
+
+.btn-edit { background-color: #f39c12; }
+.btn-delete { background-color: #e74c3c; }
+
+.badge-info {
+    background: #eef2f7;
+    color: #0077c9;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.9em;
+}
+
+/* =========================================
+   7. FORMULARIOS
+========================================= */
+.form-container {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+textarea.form-control {
+    resize: none;
+    height: 100px;
+    overflow-y: auto;
+    font-family: inherit;
+}

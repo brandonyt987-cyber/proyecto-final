@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Registrar Vocero</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+    <div th:replace="~{dashboard :: sidebar}"></div>
+    <div class="main-content">
+        <header th:replace="~{dashboard :: header-top}"></header>
+
+        <div class="dashboard-area">
+            <div class="form-container" style="margin:0 auto; max-width: 900px;">
+                <h2>Asignar Rol de Vocero</h2>
+                
+                <div th:if="${error}" class="alert-error-global"><span th:text="${error}"></span></div>
+
+                <div class="card mb-4" th:unless="${busquedaRealizada}" style="background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <div style="padding:15px; background:#0077c9; color:white; border-radius: 8px 8px 0 0;">
+                        <h4 style="margin:0;">Paso 1: Buscar Aprendiz por Documento</h4>
+                    </div>
+                    <div style="padding: 20px;">
+                        <form th:action="@{/voceros/buscar}" method="get" novalidate style="display:flex; gap:10px; align-items: flex-end;">
+                            <div style="flex-grow:1;">
+                                <label style="font-weight:bold; display:block; margin-bottom:5px;">Documento del Aprendiz:</label>
+                                <input type="text" name="documento" class="form-control" placeholder="Ingrese número de documento..." required>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn-create" style="height: 42px; padding: 0 25px;">Buscar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card" th:if="${busquedaRealizada}" style="background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <div style="padding:15px; background:#1abc9c; color:white; border-radius: 8px 8px 0 0;">
+                        <h4 style="margin:0;">Paso 2: Confirmar Candidato</h4>
+                    </div>
+                    <div style="padding: 20px;">
+                        
+                        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #e9ecef; margin-bottom: 25px;">
+                            <h3 style="margin-top:0; color:#0077c9; font-size: 1.1rem; border-bottom: 2px solid #e9ecef; padding-bottom: 10px; margin-bottom: 15px;">
+                                Datos del Aprendiz
+                            </h3>
+                            
+                            <div class="row" style="display:flex; gap: 30px; flex-wrap: wrap;">
+                                <div style="flex:1; min-width: 300px;">
+                                    <p style="margin-bottom: 8px;"><strong>Nombre:</strong> <br> <span style="font-size:1.1em;" th:text="${aprendiz.nombreCompleto}"></span></p>
+                                    <p style="margin-bottom: 8px;"><strong>Documento:</strong> <br> <span th:text="${aprendiz.tipoDocumento} + ' - ' + ${aprendiz.numeroDocumento}"></span></p>
+                                    <p style="margin-bottom: 8px;"><strong>Contacto:</strong> <br> 📧 <span th:text="${aprendiz.correo}"></span> <br> 📱 <span th:text="${aprendiz.celular}"></span></p>
+                                </div>
+                                <div style="flex:1; min-width: 300px; border-left: 1px solid #ddd; padding-left: 20px;">
+                                    <p style="margin-bottom: 8px;"><strong>Ficha:</strong> <br> <span style="font-weight:bold; color:#0077c9; font-size:1.1em;" th:text="${aprendiz.ficha.codigo}"></span></p>
+                                    <p style="margin-bottom: 8px;"><strong>Programa:</strong> <br> <span th:text="${aprendiz.ficha.programa}"></span></p>
+                                    <p style="margin-bottom: 8px;"><strong>Etapa:</strong> <br> <span style="background:#eef2f7; color:#0077c9; padding:2px 8px; border-radius:4px; font-size:0.9em;" th:text="${aprendiz.etapaFormacion}"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <form method="POST" th:action="@{/voceros/guardar}" th:object="${vocero}" novalidate>
+                            <input type="hidden" th:field="*{aprendiz.id}" />
+                            
+                            <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+                                <button type="submit" style="background-color: #1abc9c; color:white; padding: 12px; border:none; border-radius:5px; font-weight:bold; cursor:pointer; font-size:1rem; width:100%;">
+                                    Confirmar como Vocero
+                                </button>
+                                
+                                <a th:href="@{/voceros}" style="text-align:center; background-color: #6c757d; color:white; padding: 12px; border-radius:5px; text-decoration:none; font-weight:bold; width:100%; box-sizing:border-box;">
+                                    Cancelar
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

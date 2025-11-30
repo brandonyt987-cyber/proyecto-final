@@ -1,0 +1,165 @@
+/* Archivo: estilos.css */
+
+/* --- Estilos Generales y del Cuerpo --- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* Fondo suave para contrastar con el formulario */
+    background-color: #f4f7f6; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* --- Contenedor Principal del Formulario --- */
+.form-container {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    /* Sombra elegante */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); 
+    
+    /* 🔑 AJUSTE: Ocupa el 80% del ancho de la vista */
+    width: 80%; 
+    max-width: 900px; /* Límite en pantallas grandes */
+    
+    box-sizing: border-box;
+}
+
+h2 {
+    text-align: center;
+    /* Color SENA (azul) */
+    color: #0077c9; 
+    margin-bottom: 25px;
+    font-weight: 700;
+}
+
+/* --- Grupos de Campos --- */
+.form-group {
+    margin-bottom: 18px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* --- Estilos de Input y Select --- */
+input[type="text"], 
+input[type="email"], 
+input[type="password"],
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+    font-size: 1em;
+}
+
+input:focus, select:focus {
+    /* Resalta el foco con el color azul SENA */
+    border-color: #0077c9; 
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 119, 201, 0.3);
+}
+
+/* --- Botón de Enviar --- */
+button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    /* Verde SENA principal */
+    background-color: #1abc9c; 
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 700;
+    transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+    /* Tono más oscuro al pasar el ratón */
+    background-color: #15a383; 
+}
+
+/* --- Mensajes de Validación de Campo --- */
+.error-message {
+    /* Color rojo para errores */
+    color: #d9534f; 
+    font-size: 0.85em;
+    margin-top: 5px;
+    font-weight: 500;
+    display: block;
+}
+
+/* --- Mensajes de Error Global (rojo, como el de "Email o Contraseña inválidos") --- */
+.alert-error-global {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* --- 🔑 Mensajes de Éxito Global (verde) --- */
+.alert-success-global {
+    background-color: #d4edda; 
+    color: #155724; 
+    border: 1px solid #c3e6cb;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: 600;
+}
+
+
+/* --- Enlace de Login/Registro --- */
+.login-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.95em;
+}
+
+.login-link a {
+    color: #0077c9;
+    text-decoration: none;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}
+
+/* Estilo para el botón Cancelar */
+.btn-cancel {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #6c757d; /* Gris estándar para acciones secundarias */
+    color: white;
+    text-align: center;
+    text-decoration: none; /* Quita el subrayado */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 700;
+    margin-top: 10px; /* Espacio entre Guardar y Cancelar */
+    transition: background-color 0.3s;
+    box-sizing: border-box;
+}
+
+.btn-cancel:hover {
+    background-color: #5a6268; /* Gris más oscuro al pasar el mouse */
+    color: white;
+    text-decoration: none;
+}

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Gestión de Aprendices</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    
+    <style>
+        /* Estilos específicos copiados y adaptados de tu módulo Comités */
+        .btn-create {
+            background: #1abc9c; color: white; padding: 10px 20px; 
+            text-decoration: none; border-radius: 5px; font-weight: bold;
+            white-space: nowrap;
+        }
+        .btn-create:hover { background: #16a085; }
+
+        /* Estilo para el botón de Importar (Verde más oscuro) */
+        .btn-import {
+            background: #27ae60; color: white; padding: 10px 20px; 
+            text-decoration: none; border-radius: 5px; font-weight: bold;
+            white-space: nowrap;
+        }
+        .btn-import:hover { background: #219150; }
+
+        /* Contenedor de botones de acción en la tabla */
+        .action-buttons { display: flex; gap: 5px; justify-content: center; }
+        
+        /* Botones de la tabla (Pequeños) */
+        .btn-action-table { 
+            padding: 6px 10px; border-radius: 4px; text-decoration: none; 
+            font-size: 0.85em; font-weight: 600; color: white !important;
+        }
+        
+        .btn-edit { background-color: #f39c12; }
+        .btn-edit:hover { background-color: #e67e22; }
+
+        .btn-delete { background-color: #e74c3c; }
+        .btn-delete:hover { background-color: #c0392b; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{dashboard :: sidebar}"></div>
+    <div class="main-content">
+        <header th:replace="~{dashboard :: header-top}"></header>
+
+        <div class="dashboard-area">
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2>Gestión de Aprendices</h2>
+                
+                <div style="display:flex; gap: 10px;" sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/aprendices/importar}" class="btn-import">📂 Carga Masiva</a>
+                    <a th:href="@{/aprendices/crear}" class="btn-create">+ Nuevo Aprendiz</a>
+                </div>
+            </div>
+
+            <div th:if="${exito}" class="alert-success-global"><span th:text="${exito}"></span></div>
+            <div th:if="${error}" class="alert-error-global"><span th:text="${error}"></span></div>
+
+            <div style="background:white; padding:20px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+                
+                <table style="width:100%; border-collapse:collapse; font-size: 0.9em;">
+                    <thead style="background:#0077c9; color:white;">
+                        <tr>
+                            <th style="padding:12px; text-align:center; width: 40px;">ID</th>
+                            <th style="padding:12px;">Documento</th>
+                            <th style="padding:12px;">Nombre Completo</th>
+                            <th style="padding:12px; text-align:center;">Edad</th> <th style="padding:12px;">Ficha</th>
+                            <th style="padding:12px;">Programa</th>
+                            <th style="padding:12px;">Correo</th> 
+                            <th style="padding:12px;">Celular</th>
+                            <th sec:authorize="hasRole('ADMIN')" style="padding:12px; text-align:center;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="a : ${aprendices}" style="border-bottom:1px solid #eee;">
+                            
+                            <td style="padding:12px; text-align:center; font-weight:bold;" th:text="${a.id}"></td>
+                            <td style="padding:12px;" th:text="${a.numeroDocumento}"></td>
+                            <td style="padding:12px;" th:text="${a.nombreCompleto}"></td>
+                            
+                            <td style="padding:12px; text-align:center;" th:text="${a.edad} + ' años'"></td>
+                            
+                            <td style="padding:12px;">
+                                <span style="background:#eef2f7; color:#0077c9; padding:4px 8px; border-radius:4px; font-weight:bold;" 
+                                      th:text="${a.ficha.codigo}"></span>
+                            </td>
+                            
+                            <td style="padding:12px;" th:text="${#strings.abbreviate(a.ficha.programa, 20)}"></td>
+                            
+                            <td style="padding:12px;" th:text="${a.correo}"></td>
+                            <td style="padding:12px;" th:text="${a.celular}"></td>
+                            
+                            <td sec:authorize="hasRole('ADMIN')" style="padding:12px; text-align:center;">
+                                <div class="action-buttons">
+                                    <a th:href="@{/aprendices/editar/{id}(id=${a.id})}" 
+                                       class="btn-action-table btn-edit">Editar</a>
+                                       
+                                    <a th:href="@{/aprendices/eliminar/{id}(id=${a.id})}" 
+                                       class="btn-action-table btn-delete"
+                                       onclick="return confirm('¿Eliminar aprendiz?')">Eliminar</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

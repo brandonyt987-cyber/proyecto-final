@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Nueva Coordinación</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+    <div th:replace="~{dashboard :: sidebar}"></div>
+    <div class="main-content">
+        <header th:replace="~{dashboard :: header-top}"></header>
+        <div class="dashboard-area">
+            <div class="form-container" style="margin:0 auto; max-width: 600px;">
+                <h2>Registrar Coordinación</h2>
+                <div th:if="${error}" class="alert-error-global"><span th:text="${error}"></span></div>
+                
+                <form method="POST" th:action="@{/coordinaciones/guardar}" th:object="${coordinacion}" novalidate>
+                    <div class="form-group">
+                        <label>Nombre de la Coordinación:</label>
+                        <input type="text" th:field="*{nombre}" class="form-control" placeholder="Ej: Teleinformática" required>
+                        <span th:errors="*{nombre}" class="error-message"></span>
+                    </div>
+                    <button type="submit">Guardar</button>
+                    <a th:href="@{/coordinaciones}" class="btn-cancel">Cancelar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
