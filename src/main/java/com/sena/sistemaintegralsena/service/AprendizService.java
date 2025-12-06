@@ -15,6 +15,7 @@ public interface AprendizService {
     
     List<Aprendiz> buscarPorFicha(Long fichaId);
     
-    // 🔑 MÉTODO NECESARIO
+    Aprendiz buscarPorDocumento(String documento); 
+    
     long totalAprendices();
 }

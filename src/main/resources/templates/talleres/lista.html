@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Gestión de Talleres</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="icon" type="image/png" th:href="@{/img/logo-sena.png}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    
+    <style>
+        .table-container { overflow-x: auto; }
+        .sub-text { display: block; font-size: 0.85em; color: #666; margin-top: 2px; }
+        
+        /* Buscador */
+        .header-tools { display: flex; gap: 15px; align-items: center; }
+        .search-input {
+            padding: 10px 20px; border-radius: 50px; border: 1px solid #ccc;
+            outline: none; font-size: 0.9rem; width: 250px; transition: all 0.3s;
+        }
+        .search-input:focus { border-color: #6A11CB; box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1); }
+    </style>
+</head>
+<body>
+    
+    <div th:replace="~{dashboard :: sidebar}"></div>
+    
+    <div class="main-content">
+        <header th:replace="~{dashboard :: header-top}"></header>
+
+        <div class="dashboard-area">
+            
+            <div class="actions-header">
+                <h3>Talleres Programados</h3>
+                
+                <div class="header-tools">
+                    <input type="text" id="searchInput" class="search-input" onkeyup="filtrarTabla()" placeholder="Buscar taller...">
+                    
+                    <a th:href="@{/talleres/crear}" class="btn-main btn-create">
+                        + Programar Taller
+                    </a>
+                </div>
+            </div>
+
+            <div th:if="${exito}" style="margin-bottom: 20px; text-align: center; color: green; font-weight: bold;">
+                <span th:text="${exito}"></span>
+            </div>
+
+            <div class="table-container">
+                <table class="crud-table" id="tablaDatos">
+                    <thead>
+                        <tr>
+                            <th class="center" style="width:50px;">ID</th>
+                            <th>Nombre Taller</th>
+                            <th>Ficha / Programa</th>
+                            <th>Profesional</th>
+                            <th>Fecha / Horario</th>
+                            <th class="center">Cupo</th>
+                            <th class="center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="t : ${talleres}">
+                            <td class="center" style="font-weight:bold;" th:text="${t.id}"></td>
+                            <td th:text="${t.nombreTaller}"></td>
+                            <td>
+                                <span class="badge-info" th:text="${t.ficha.codigo}"></span>
+                                <span class="sub-text" th:text="${#strings.abbreviate(t.ficha.programa, 25)}"></span>
+                                <span class="sub-text" style="font-style:italic;" th:text="${t.ficha.jornada}"></span>
+                            </td>
+                            <td th:text="${t.profesional.nombre}"></td>
+                            <td>
+                                <strong th:text="${#temporals.format(t.fecha, 'dd-MM-yyyy')}"></strong>
+                                <span class="sub-text" th:text="${t.horaInicio} + ' - ' + ${t.horaFin}"></span>
+                            </td>
+                            <td class="center" th:text="${t.cupo}"></td>
+                            
+                            <td class="center">
+                                <div class="action-buttons">
+                                    <a th:href="@{/talleres/editar/{id}(id=${t.id})}" class="btn-table-action btn-edit">Editar</a>
+                                    <a th:href="@{/talleres/eliminar/{id}(id=${t.id})}" class="btn-table-action btn-delete" onclick="return confirm('¿Eliminar Taller?')">Eliminar</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr id="noResults" style="display:none;">
+                            <td colspan="7" style="text-align:center; padding: 20px; color: #666;">No se encontraron resultados.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div th:if="${#lists.isEmpty(talleres)}" style="text-align:center; padding:30px; color:#666;">
+                No hay talleres programados.
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function filtrarTabla() {
+            var input, filter, table, tr, td, i, j, visible;
+            input = document.getElementById("searchInput");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("tablaDatos");
+            tr = table.getElementsByTagName("tr");
+            var noResults = document.getElementById("noResults");
+            var hayResultados = false;
+
+            for (i = 1; i < tr.length; i++) {
+                if (tr[i].id === "noResults") continue;
+                visible = false;
+                td = tr[i].getElementsByTagName("td");
+                for (j = 0; j < td.length; j++) {
+                    if (td[j] && td[j].textContent.toUpperCase().indexOf(filter) > -1) {
+                        visible = true;
+                        break;
+                    }
+                }
+                if (visible) {
+                    tr[i].style.display = "";
+                    hayResultados = true;
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+            
+            if (!hayResultados && filter !== "") {
+                noResults.style.display = "table-row";
+            } else {
+                noResults.style.display = "none";
+            }
+        }
+    </script>
+
+</body>
+</html>

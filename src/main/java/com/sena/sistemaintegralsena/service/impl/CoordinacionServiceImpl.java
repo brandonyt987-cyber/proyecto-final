@@ -1,0 +1,53 @@
+package com.sena.sistemaintegralsena.service.impl;
+
+import com.sena.sistemaintegralsena.entity.Coordinacion;
+import com.sena.sistemaintegralsena.repository.CoordinacionRepository;
+import com.sena.sistemaintegralsena.service.CoordinacionService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+public class CoordinacionServiceImpl implements CoordinacionService {
+
+    private final CoordinacionRepository repository;
+
+    public CoordinacionServiceImpl(CoordinacionRepository repository) {
+        this.repository = repository;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Coordinacion> listarTodas() {
+        return repository.findAll();
+    }
+
+    @Override
+    @Transactional
+    public void guardar(Coordinacion coordinacion) {
+        // Validación simple de duplicados al crear
+        if (coordinacion.getId() == null && repository.existsByNombre(coordinacion.getNombre())) {
+             throw new RuntimeException("La coordinación '" + coordinacion.getNombre() + "' ya existe.");
+        }
+        repository.save(coordinacion);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Coordinacion buscarPorId(Long id) {
+        return repository.findById(id).orElse(null);
+    }
+
+    @Override
+    @Transactional
+    public void eliminar(Long id) {
+        repository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long totalCoordinaciones() {
+        return repository.count();
+    }
+}

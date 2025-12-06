@@ -2,6 +2,7 @@ package com.sena.sistemaintegralsena.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull; // Importante para objetos
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -22,21 +23,22 @@ public class Ficha {
     @Column(unique = true, nullable = false, length = 12)
     private String codigo;
 
-    // 2. LETRAS Y NÚMEROS (Longitud razonable de 100)
+    // 2. PROGRAMA
     @NotBlank(message = "El programa es obligatorio")
     @Size(min = 5, max = 100, message = "El nombre del programa debe tener entre 5 y 100 caracteres")
     private String programa;
 
-    // 3. COORDINACIÓN (Texto libre, máx 80 caracteres)
-    @NotBlank(message = "La coordinación es obligatoria")
-    @Size(max = 80, message = "Nombre de coordinación muy largo")
-    private String coordinacion;
+    // 3. COORDINACIÓN (AHORA ES UNA RELACIÓN)
+    @NotNull(message = "Debe seleccionar una coordinación")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "coordinacion_id", nullable = false)
+    private Coordinacion coordinacion;
 
-    // 4. JORNADA (Validamos que no esté vacío, el HTML limita las opciones)
+    // 4. JORNADA
     @NotBlank(message = "Seleccione una jornada")
     private String jornada;
 
-    // 5. MODALIDAD (Validamos que no esté vacío)
+    // 5. MODALIDAD
     @NotBlank(message = "Seleccione una modalidad")
     private String modalidad;
 }

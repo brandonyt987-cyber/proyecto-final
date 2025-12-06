@@ -2,54 +2,139 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title>Gestión de Fichas</title>
-    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="icon" type="image/png" th:href="@{/img/logo-sena.png}">
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    
+    <style>
+        .header-tools {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .search-input {
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 1px solid #ccc;
+            outline: none;
+            font-size: 0.9rem;
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+        .search-input:focus {
+            border-color: #6A11CB;
+            box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1);
+        }
+    </style>
 </head>
 <body>
+    
     <div th:replace="~{dashboard :: sidebar}"></div>
+    
     <div class="main-content">
         <header th:replace="~{dashboard :: header-top}"></header>
 
         <div class="dashboard-area">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h2>Gestión de Fichas</h2>
-                <a sec:authorize="hasRole('ADMIN')" th:href="@{/fichas/crear}" class="btn-create" style="background:#1abc9c; color:white; padding:10px 20px; text-decoration:none; border-radius:5px; font-weight:bold;">+ Nueva Ficha</a>
+            
+            <div class="actions-header">
+                <h3>Gestión de Fichas</h3>
+                
+                <div class="header-tools">
+                    <input type="text" id="searchInput" class="search-input" onkeyup="filtrarTabla()" placeholder="Buscar ficha...">
+                    
+                    <a sec:authorize="hasRole('ADMIN')" 
+                       th:href="@{/fichas/crear}" 
+                       class="btn-main btn-create">
+                        + Nueva Ficha
+                    </a>
+                </div>
             </div>
 
-            <div th:if="${exito}" class="alert-success-global"><span th:text="${exito}"></span></div>
-            <div th:if="${error}" class="alert-error-global"><span th:text="${error}"></span></div>
+            <div th:if="${exito}" style="margin-bottom: 20px; text-align: center; color: green; font-weight: bold;">
+                <span th:text="${exito}"></span>
+            </div>
+            <div th:if="${error}" style="margin-bottom: 20px; text-align: center; color: red; font-weight: bold;">
+                <span th:text="${error}"></span>
+            </div>
 
-            <div style="background:white; padding:20px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
-                <table style="width:100%; border-collapse:collapse;">
-                    <thead style="background:#0077c9; color:white;">
+            <div class="table-container">
+                <table class="crud-table" id="tablaDatos">
+                    <thead>
                         <tr>
-                            <th style="padding:12px; text-align:center;">ID</th>
-                            <th style="padding:12px;">Código</th>
-                            <th style="padding:12px;">Programa</th>
-                            <th style="padding:12px;">Jornada</th>
-                            <th style="padding:12px;">Coordinación</th>
-                            <th sec:authorize="hasRole('ADMIN')" style="padding:12px;">Acciones</th>
+                            <th style="width: 40px; text-align: center;">ID</th>
+                            <th>Código</th>
+                            <th>Programa</th>
+                            <th>Jornada</th>
+                            <th>Coordinación</th>
+                            <th sec:authorize="hasRole('ADMIN')" class="center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="f : ${fichas}" style="border-bottom:1px solid #eee;">
-                            
-                            <td style="padding:12px; text-align:center; font-weight:bold;" th:text="${f.id}"></td>
-                            
-                            <td style="padding:12px;" th:text="${f.codigo}"></td>
-                            
-                            <td style="padding:12px;" th:text="${f.programa}"></td>
-                            <td style="padding:12px;" th:text="${f.jornada}"></td>
-                            <td style="padding:12px;" th:text="${f.coordinacion}"></td>
-                            <td sec:authorize="hasRole('ADMIN')" style="padding:12px;">
-                                <a th:href="@{/fichas/editar/{id}(id=${f.id})}" style="color:#f39c12; font-weight:bold; margin-right:10px; text-decoration:none;">Editar</a>
-                                <a th:href="@{/fichas/eliminar/{id}(id=${f.id})}" onclick="return confirm('¿Eliminar ficha?')" style="color:#e74c3c; font-weight:bold; text-decoration:none;">Eliminar</a>
+                        <tr th:each="f : ${fichas}">
+                            <td style="text-align: center; font-weight: bold;" th:text="${f.id}"></td>
+                            <td th:text="${f.codigo}" style="font-weight: bold; color: #2c3e50;"></td>
+                            <td th:text="${f.programa}"></td>
+                            <td>
+                                <span class="badge-info" th:text="${f.jornada}"></span>
                             </td>
+                            <td th:text="${f.coordinacion.nombre}"></td>
+                            
+                            <td sec:authorize="hasRole('ADMIN')" class="center">
+                                <div class="action-buttons">
+                                    <a th:href="@{/fichas/editar/{id}(id=${f.id})}" class="btn-table-action btn-edit">Editar</a>
+                                    <a th:href="@{/fichas/eliminar/{id}(id=${f.id})}" 
+                                       class="btn-table-action btn-delete"
+                                       onclick="return confirm('¿Eliminar ficha?')">Eliminar</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr id="noResults" style="display:none;">
+                            <td colspan="6" style="text-align:center; padding: 20px; color: #666;">No se encontraron resultados.</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+
         </div>
     </div>
+
+    <script>
+        function filtrarTabla() {
+            var input, filter, table, tr, td, i, j, visible;
+            input = document.getElementById("searchInput");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("tablaDatos");
+            tr = table.getElementsByTagName("tr");
+            var noResults = document.getElementById("noResults");
+            var hayResultados = false;
+
+            for (i = 1; i < tr.length; i++) {
+                if (tr[i].id === "noResults") continue;
+                visible = false;
+                td = tr[i].getElementsByTagName("td");
+                for (j = 0; j < td.length; j++) {
+                    if (td[j] && td[j].textContent.toUpperCase().indexOf(filter) > -1) {
+                        visible = true;
+                        break;
+                    }
+                }
+                if (visible) {
+                    tr[i].style.display = "";
+                    hayResultados = true;
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+            
+            if (!hayResultados && filter !== "") {
+                noResults.style.display = "table-row";
+            } else {
+                noResults.style.display = "none";
+            }
+        }
+    </script>
+
 </body>
 </html>

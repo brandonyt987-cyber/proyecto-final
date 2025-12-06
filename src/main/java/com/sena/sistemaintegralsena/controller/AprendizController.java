@@ -1,7 +1,7 @@
 package com.sena.sistemaintegralsena.controller;
 
 import com.sena.sistemaintegralsena.entity.Aprendiz;
-import com.sena.sistemaintegralsena.service.AprendizExcelService; // <--- NUEVO
+import com.sena.sistemaintegralsena.service.AprendizExcelService;
 import com.sena.sistemaintegralsena.service.AprendizService;
 import com.sena.sistemaintegralsena.service.FichaService;
 import jakarta.validation.Valid;
@@ -10,8 +10,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile; // <--- NUEVO
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.time.LocalDate; // 👈 Importante
 
 @Controller
 @RequestMapping("/aprendices")
@@ -19,7 +21,7 @@ public class AprendizController {
 
     private final AprendizService aprendizService;
     private final FichaService fichaService;
-    private final AprendizExcelService excelService; // <--- INYECCIÓN
+    private final AprendizExcelService excelService;
 
     public AprendizController(AprendizService aprendizService, 
                               FichaService fichaService,
@@ -29,7 +31,14 @@ public class AprendizController {
         this.excelService = excelService;
     }
 
-    // ... (listar, crear, guardar, editar, actualizar, eliminar SE MANTIENEN IGUAL) ...
+    // MÉTODO AUXILIAR PARA LA EDAD
+    private void configurarLimiteEdad(Model model) {
+        // La fecha máxima de nacimiento permitida es HOY - 16 AÑOS
+        // Ejemplo: Si hoy es 2025, la fecha max es 2009. Alguien nacido en 2010 tendría 15.
+        LocalDate maxDate = LocalDate.now().minusYears(16);
+        model.addAttribute("maxDate", maxDate);
+    }
+
     @GetMapping
     public String listar(Model model) {
         model.addAttribute("aprendices", aprendizService.listarTodos());
@@ -41,6 +50,7 @@ public class AprendizController {
     public String formCrear(Model model) {
         model.addAttribute("aprendiz", new Aprendiz());
         model.addAttribute("fichas", fichaService.listarTodas());
+        configurarLimiteEdad(model); // 👈 Enviar restricción
         return "aprendices/crear";
     }
 
@@ -49,6 +59,7 @@ public class AprendizController {
     public String guardar(@Valid @ModelAttribute Aprendiz aprendiz, BindingResult result, Model model, RedirectAttributes redirect) {
         if (result.hasErrors()) {
             model.addAttribute("fichas", fichaService.listarTodas());
+            configurarLimiteEdad(model); // 👈 Re-enviar si falla
             return "aprendices/crear";
         }
         try {
@@ -57,6 +68,7 @@ public class AprendizController {
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("fichas", fichaService.listarTodas());
+            configurarLimiteEdad(model); // 👈 Re-enviar si falla
             return "aprendices/crear";
         }
         return "redirect:/aprendices";
@@ -69,6 +81,7 @@ public class AprendizController {
         if (aprendiz == null) return "redirect:/aprendices";
         model.addAttribute("aprendiz", aprendiz);
         model.addAttribute("fichas", fichaService.listarTodas());
+        configurarLimiteEdad(model); // 👈 Enviar restricción
         return "aprendices/editar";
     }
 
@@ -77,6 +90,7 @@ public class AprendizController {
     public String actualizar(@Valid @ModelAttribute Aprendiz aprendiz, BindingResult result, Model model, RedirectAttributes redirect) {
         if (result.hasErrors()) {
             model.addAttribute("fichas", fichaService.listarTodas());
+            configurarLimiteEdad(model);
             return "aprendices/editar";
         }
         try {
@@ -85,6 +99,7 @@ public class AprendizController {
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("fichas", fichaService.listarTodas());
+            configurarLimiteEdad(model);
             return "aprendices/editar";
         }
         return "redirect:/aprendices";
@@ -102,10 +117,7 @@ public class AprendizController {
         return "redirect:/aprendices";
     }
 
-    // ---------------------------------------------
-    // 📂 NUEVOS MÉTODOS PARA CARGA MASIVA
-    // ---------------------------------------------
-
+    // ... (Métodos de importación se mantienen igual)
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/importar")
     public String vistaImportar() {
@@ -119,7 +131,6 @@ public class AprendizController {
             redirect.addFlashAttribute("error", "Por favor seleccione un archivo.");
             return "redirect:/aprendices/importar";
         }
-
         try {
             excelService.guardar(file);
             redirect.addFlashAttribute("exito", "Carga masiva exitosa.");

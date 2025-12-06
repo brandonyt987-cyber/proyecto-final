@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Gestionar Vocero | SENA</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="icon" type="image/png" th:href="@{/img/logo-sena.png}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    
+    <style>
+        /* Estilo específico para la tarjeta de información del vocero actual */
+        .vocero-info-card {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-left: 6px solid #FFB75E; /* Naranja Editar */
+            margin-bottom: 30px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .search-replace-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px dashed #ccc;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 768px) { .info-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    
+    <div th:replace="~{dashboard :: sidebar}"></div>
+    
+    <div class="main-content">
+        <header th:replace="~{dashboard :: header-top}"></header>
+
+        <div class="dashboard-area">
+            
+            <h3 style="text-align: center; margin-bottom: 25px;">Gestionar / Reemplazar Vocero</h3>
+
+            <div class="form-container" style="max-width: 900px; margin: 0 auto;">
+                
+                <div th:if="${error}" style="background: #fee2e2; color: #991b1b; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: bold;">
+                    <span th:text="${error}"></span>
+                </div>
+                <div th:if="${exitoBusqueda}" style="background: #dcfce7; color: #166534; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: bold;">
+                    <span th:text="${exitoBusqueda}"></span>
+                </div>
+
+                <div class="vocero-info-card">
+                    <h4 style="margin-top:0; color:#E67E22; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                        Vocero Seleccionado
+                    </h4>
+                    
+                    <div class="info-grid">
+                        <div>
+                            <p style="margin-bottom:8px;"><strong>Nombre:</strong> <br> <span th:text="${aprendiz.nombreCompleto}"></span></p>
+                            <p style="margin-bottom:8px;"><strong>Documento:</strong> <br> <span th:text="${aprendiz.tipoDocumento} + ' ' + ${aprendiz.numeroDocumento}"></span></p>
+                            <p style="margin-bottom:8px;"><strong>Correo:</strong> <br> <span th:text="${aprendiz.correo}"></span></p>
+                        </div>
+                        <div>
+                            <p style="margin-bottom:8px;"><strong>Ficha:</strong> <br> <span class="badge-info" style="font-size:1rem;" th:text="${aprendiz.ficha.codigo}"></span></p>
+                            <p style="margin-bottom:8px;"><strong>Programa:</strong> <br> <span th:text="${aprendiz.ficha.programa}"></span></p>
+                            <p style="margin-bottom:8px;"><strong>Celular:</strong> <br> <span th:text="${aprendiz.celular}"></span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="search-replace-box">
+                    <label style="display:block; margin-bottom:10px; color:#555; font-weight:bold;">
+                        ¿Desea cambiar el vocero? Busque el reemplazo aquí:
+                    </label>
+                    
+                    <form th:action="@{/voceros/editar/buscar-reemplazo}" method="get" style="display:flex; gap:10px; align-items:flex-end;">
+                        <input type="hidden" name="idVocero" th:value="${vocero.id}">
+                        
+                        <div style="flex-grow:1;">
+                            <input type="text" name="documento" class="form-control" placeholder="Digite el documento del nuevo aprendiz..." required>
+                        </div>
+                        
+                        <div>
+                            <button type="submit" class="btn-main" style="background: #0077c9; border: none; cursor: pointer; height: 45px;">
+                                🔍 Buscar Nuevo
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
+
+                <form method="POST" th:action="@{/voceros/actualizar}" th:object="${vocero}" novalidate>
+                    <input type="hidden" th:field="*{id}" />
+                    <input type="hidden" name="aprendiz.id" th:value="${aprendiz.id}" />
+                    
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="font-weight:bold; color:#333; margin-bottom: 8px; display: block;">Razón del Cambio / Observaciones:</label>
+                        <textarea th:field="*{razonCambio}" class="form-control" style="height:120px;" placeholder="Describa detalladamente el motivo de la actualización o cambio de vocero..." required></textarea>
+                        <span th:if="${#fields.hasErrors('razonCambio')}" th:errors="*{razonCambio}" class="error-message"></span>
+                    </div>
+
+                    <div style="display: flex; gap: 15px; margin-top: 30px;">
+                        <button type="submit" class="btn-main btn-edit" style="border:none; cursor:pointer; flex: 1; justify-content: center;">
+                            Guardar Cambios
+                        </button>
+                        
+                        <a th:href="@{/voceros}" class="btn-cancel" style="flex: 1;">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>

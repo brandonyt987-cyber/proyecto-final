@@ -1,84 +1,172 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Comités de Evaluación</title>
-    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="icon" type="image/png" th:href="@{/img/logo-sena.png}">
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
     
     <style>
-        /* Estilos específicos para botones si no cargan del dashboard.css global */
-        .btn-create {
-            background: #1abc9c; color: white; padding: 10px 20px; 
-            text-decoration: none; border-radius: 5px; font-weight: bold;
+        /* Estilos para tabla ancha con scroll normal */
+        .table-container {
+            overflow-x: auto; /* Habilita la barra de desplazamiento abajo */
         }
-        .action-buttons { display: flex; gap: 8px; justify-content: center; }
+        .crud-table {
+            min-width: 1600px; /* Fuerza que la tabla sea ancha para que aparezca el scroll */
+        }
         
-        .btn-delete { 
-            background-color: #e74c3c; color: white; padding: 6px 12px; 
-            border-radius: 4px; text-decoration: none; font-size: 0.85em; font-weight: 600;
+        /* Ajuste básico para la columna de acciones (SIN STICKY) */
+        .crud-table th:last-child, 
+        .crud-table td:last-child {
+            min-width: 170px;    /* Espacio para que quepan los botones */
+            white-space: nowrap; /* Que no se rompan los botones */
+            text-align: center;
         }
-        .btn-delete:hover { background-color: #c0392b; }
+
+        /* Estilos Buscador */
+        .header-tools { display: flex; gap: 15px; align-items: center; }
+        .search-input {
+            padding: 10px 20px; border-radius: 50px; border: 1px solid #ccc;
+            outline: none; font-size: 0.9rem; width: 250px; transition: all 0.3s;
+        }
+        .search-input:focus { border-color: #6A11CB; box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1); }
     </style>
 </head>
 <body>
+    
     <div th:replace="~{dashboard :: sidebar}"></div>
+    
     <div class="main-content">
         <header th:replace="~{dashboard :: header-top}"></header>
 
         <div class="dashboard-area">
             
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h2>Comités de Evaluación</h2>
-                <a th:href="@{/comite/crear}" class="btn-create">+ Nuevo Comité</a>
+            <div class="actions-header">
+                <h3>Comités de Evaluación</h3>
+                
+                <div class="header-tools">
+                    <input type="text" id="searchInput" class="search-input" onkeyup="filtrarTabla()" placeholder="Buscar comité...">
+                    
+                    <a th:href="@{/comite/crear}" class="btn-main btn-create">
+                        + Nuevo Comité
+                    </a>
+                </div>
             </div>
 
-            <div th:if="${exito}" class="alert-success-global"><span th:text="${exito}"></span></div>
+            <div th:if="${exito}" style="margin-bottom: 20px; text-align: center; color: green; font-weight: bold;">
+                <span th:text="${exito}"></span>
+            </div>
 
-            <div style="background:white; padding:20px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
-                <table style="width:100%; border-collapse:collapse;">
-                    <thead style="background:#0077c9; color:white;">
+            <div class="table-container">
+                <table class="crud-table" id="tablaDatos">
+                    <thead>
                         <tr>
-                            <th style="padding:12px; text-align:center; width: 50px;">ID</th>
-                            <th style="padding:12px;">Fecha</th>
-                            <th style="padding:12px;">Aprendiz</th>
-                            <th style="padding:12px;">Ficha</th>
-                            <th style="padding:12px;">Falta</th>
-                            <th style="padding:12px;">Motivo</th>
-                            <th style="padding:12px;">Profesional</th>
-                            <th style="padding:12px; text-align:center;">Acciones</th>
+                            <th class="center" style="width: 50px;">ID</th>
+                            <th>Fecha</th>
+                            <th>Aprendiz</th>
+                            <th>Ficha</th>
+                            
+                            <th>Coordinación</th>
+                            <th>Instructor</th>
+                            
+                            <th>Falta</th>
+                            <th>Motivo</th>
+                            <th>Recomendación</th>
+                            <th>Plan Mejoramiento</th>
+                            <th>Fecha Plazo</th>
+                            <th class="center">Paz y Salvo</th>
+                            
+                            <th class="center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="c : ${comites}" style="border-bottom:1px solid #eee;">
+                        <tr th:each="c : ${comites}">
                             
-                            <td style="padding:12px; text-align:center; font-weight:bold;" th:text="${c.id}"></td>
+                            <td class="center" style="font-weight:bold;" th:text="${c.id}"></td>
+                            <td th:text="${c.fecha}"></td>
+                            <td th:text="${c.aprendiz?.nombreCompleto ?: '---'}"></td>
                             
-                            <td style="padding:12px;" th:text="${c.fecha}"></td>
-                            <td style="padding:12px;" th:text="${c.aprendiz.nombreCompleto}"></td>
-                            
-                            <td style="padding:12px;">
-                                <span style="background:#eef2f7; color:#0077c9; padding:4px 8px; border-radius:4px; font-weight:bold;" 
-                                      th:text="${c.aprendiz.ficha.codigo}"></span>
+                            <td>
+                                <span class="badge-info" th:text="${c.aprendiz?.ficha?.codigo ?: 'N/A'}"></span>
                             </td>
                             
-                            <td style="padding:12px;" th:text="${c.tipoFalta}"></td>
+                            <td th:text="${c.coordinacion.nombre}"></td>
+                            <td th:text="${c.instructor.nombreCompleto}"></td>
                             
-                            <td style="padding:12px;" th:text="${#strings.abbreviate(c.motivo, 30)}"></td>
+                            <td th:text="${c.tipoFalta}"></td>
+                            <td th:text="${#strings.abbreviate(c.motivo, 20)}" th:title="${c.motivo}"></td>
+                            <td th:text="${#strings.abbreviate(c.recomendacion, 20)}" th:title="${c.recomendacion}"></td>
+                            <td th:text="${#strings.abbreviate(c.planMejoramiento, 20)}" th:title="${c.planMejoramiento}"></td>
+                            <td th:text="${c.fechaPlazo}"></td>
                             
-                            <td style="padding:12px;" th:text="${c.profesional.nombre}"></td>
+                            <td class="center">
+                                <span th:if="${c.pazSalvo}" style="color:green; font-weight:bold;">SÍ</span>
+                                <span th:unless="${c.pazSalvo}" style="color:red; font-weight:bold;">NO</span>
+                            </td>
                             
-                            <td style="padding:12px; text-align:center;">
-                                <div class="action-buttons" sec:authorize="hasRole('ADMIN')">
-                                    <a th:href="@{/comite/eliminar/{id}(id=${c.id})}" 
-                                       class="btn-delete"
-                                       onclick="return confirm('¿Eliminar registro?')">Eliminar</a>
+                            <td class="center">
+                                <div class="action-buttons">
+                                    <a th:href="@{/comite/editar/{id}(id=${c.id})}" class="btn-table-action btn-edit">Editar</a>
+                                    
+                                    <div sec:authorize="hasRole('ADMIN')" style="display:inline;">
+                                        <a th:href="@{/comite/eliminar/{id}(id=${c.id})}" 
+                                           class="btn-table-action btn-delete"
+                                           onclick="return confirm('¿Eliminar registro?')">Eliminar</a>
+                                    </div>
                                 </div>
                             </td>
+                        </tr>
+                        <tr id="noResults" style="display:none;">
+                            <td colspan="13" style="text-align:center; padding: 20px; color: #666;">No se encontraron resultados.</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+            
+            <div th:if="${#lists.isEmpty(comites)}" style="text-align:center; padding:30px; color:#666;">
+                No hay comités registrados.
+            </div>
+
         </div>
     </div>
+
+    <script>
+        function filtrarTabla() {
+            var input, filter, table, tr, td, i, j, visible;
+            input = document.getElementById("searchInput");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("tablaDatos");
+            tr = table.getElementsByTagName("tr");
+            var noResults = document.getElementById("noResults");
+            var hayResultados = false;
+
+            for (i = 1; i < tr.length; i++) {
+                if (tr[i].id === "noResults") continue;
+                visible = false;
+                td = tr[i].getElementsByTagName("td");
+                for (j = 0; j < td.length; j++) {
+                    if (td[j] && td[j].textContent.toUpperCase().indexOf(filter) > -1) {
+                        visible = true;
+                        break;
+                    }
+                }
+                if (visible) {
+                    tr[i].style.display = "";
+                    hayResultados = true;
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+            
+            if (!hayResultados && filter !== "") {
+                noResults.style.display = "table-row";
+            } else {
+                noResults.style.display = "none";
+            }
+        }
+    </script>
+
 </body>
 </html>

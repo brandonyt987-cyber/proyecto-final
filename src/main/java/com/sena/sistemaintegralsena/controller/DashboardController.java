@@ -1,8 +1,11 @@
 package com.sena.sistemaintegralsena.controller;
 
-import com.sena.sistemaintegralsena.service.AprendizService; // Importar
-import com.sena.sistemaintegralsena.service.FichaService;   // Importar
-import com.sena.sistemaintegralsena.service.UsuarioService; // Importar
+import com.sena.sistemaintegralsena.service.AprendizService;
+import com.sena.sistemaintegralsena.service.CoordinacionService;
+import com.sena.sistemaintegralsena.service.FichaService;
+import com.sena.sistemaintegralsena.service.UsuarioService;
+import com.sena.sistemaintegralsena.service.InstructorService;
+import com.sena.sistemaintegralsena.service.VoceroService; // 👈 NUEVO IMPORT AGREGADO
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,16 +16,24 @@ import java.security.Principal;
 public class DashboardController {
 
     private final UsuarioService usuarioService;
-    private final FichaService fichaService;     // Nuevo atributo
-    private final AprendizService aprendizService; // Nuevo atributo
+    private final FichaService fichaService;
+    private final AprendizService aprendizService;
+    private final CoordinacionService coordinacionService;
+    private final InstructorService instructorService;
+    private final VoceroService voceroService; 
 
-    // Inyectar los 3 servicios
     public DashboardController(UsuarioService usuarioService, 
                                FichaService fichaService,
-                               AprendizService aprendizService) {
+                               AprendizService aprendizService,
+                               CoordinacionService coordinacionService,
+                               InstructorService instructorService,
+                               VoceroService voceroService) {
         this.usuarioService = usuarioService;
         this.fichaService = fichaService;
         this.aprendizService = aprendizService;
+        this.coordinacionService = coordinacionService;
+        this.instructorService = instructorService; 
+        this.voceroService = voceroService; 
     }
 
     @GetMapping("/dashboard")
@@ -37,8 +48,11 @@ public class DashboardController {
 
         // 2. Totales para las tarjetas
         model.addAttribute("totalUsuarios", usuarioService.totalUsuarios());
-        model.addAttribute("totalFichas", fichaService.totalFichas());       // 🔑 Dato real
-        model.addAttribute("totalAprendices", aprendizService.totalAprendices()); // 🔑 Dato real
+        model.addAttribute("totalFichas", fichaService.totalFichas());
+        model.addAttribute("totalAprendices", aprendizService.totalAprendices());
+        model.addAttribute("totalCoordinaciones", coordinacionService.totalCoordinaciones());
+        model.addAttribute("totalInstructores", instructorService.totalInstructores()); 
+        model.addAttribute("totalVoceros", voceroService.totalVoceros());
 
         return "dashboard";
     }

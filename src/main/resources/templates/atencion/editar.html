@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Editar Atención | SENA</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="icon" type="image/png" th:href="@{/img/logo-sena.png}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+
+    <style>
+        /* Tarjetas de Consultas */
+        .consulta-card {
+            padding: 15px; border-radius: 8px; margin-top: 15px; border: 1px solid rgba(0,0,0,0.05);
+        }
+        .c1 { background: #e3f2fd; border-left: 4px solid #0d47a1; }
+        .c2 { background: #f3e5f5; border-left: 4px solid #7b1fa2; }
+        .c3 { background: #e8f5e9; border-left: 4px solid #2e7d32; }
+        .consulta-title { margin: 0 0 10px 0; font-weight: 700; font-size: 0.95rem; }
+        
+        /* Tarjeta de Info Aprendiz */
+        .info-card {
+            background: #f8f9fa; padding: 20px; border-radius: 12px;
+            border-left: 5px solid #0077c9; margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .info-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; font-size: 0.95rem;
+        }
+        .info-item strong { color: #555; display: block; margin-bottom: 2px; }
+        .info-item span { color: #333; }
+    </style>
+</head>
+<body>
+    
+    <div th:replace="~{dashboard :: sidebar}"></div>
+
+    <div class="main-content">
+        <header th:replace="~{dashboard :: header-top}"></header>
+
+        <div class="dashboard-area">
+            <div class="form-container" style="margin:0 auto; max-width: 950px;">
+                
+                <h3 style="text-align: center; margin-bottom: 25px;">Editar Atención Individual</h3>
+
+                <div class="info-card">
+                    <h4 style="color:#0077c9; margin-top:0; margin-bottom:15px; border-bottom: 1px solid #e9ecef; padding-bottom: 10px;">
+                        Datos del Aprendiz
+                    </h4>
+                    
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <strong>Nombre:</strong> <span th:text="${aprendizEncontrado.nombreCompleto}"></span><br>
+                            <strong>Doc:</strong> <span th:text="${aprendizEncontrado.tipoDocumento} + ' ' + ${aprendizEncontrado.numeroDocumento}"></span><br>
+                            <strong>Edad:</strong> <span class="badge-info" id="edadBadge" th:text="${aprendizEncontrado.edad} + ' Años'"></span>
+                            <input type="hidden" id="edadAprendiz" th:value="${aprendizEncontrado.edad}">
+                        </div>
+                        <div class="info-item">
+                            <strong>Ficha:</strong> <span th:text="${aprendizEncontrado.ficha?.codigo ?: 'N/A'}"></span><br>
+                            <strong>Programa:</strong> <span th:text="${aprendizEncontrado.ficha?.programa ?: 'N/A'}"></span><br>
+                            <strong>Coordinación:</strong> <span th:text="${aprendizEncontrado.ficha?.coordinacion?.nombre ?: 'Sin Asignar'}"></span>
+                        </div>
+                        <div class="info-item">
+                            <strong>Jornada/Mod:</strong> <span th:text="${aprendizEncontrado.ficha?.jornada} + ' - ' + ${aprendizEncontrado.ficha?.modalidad}"></span><br>
+                            <strong>Contacto:</strong> <br> 
+                            📱 <span th:text="${aprendizEncontrado.celular}"></span> <br> 
+                            📧 <span th:text="${aprendizEncontrado.correo}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${error}" style="background: #fee2e2; color: #991b1b; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: bold;">
+                    <span th:text="${error}"></span>
+                </div>
+
+                <form method="POST" th:action="@{/atencion/actualizar}" th:object="${atencion}" novalidate>
+                    <input type="hidden" th:field="*{id}">
+                    <input type="hidden" name="aprendizId" th:value="${aprendizEncontrado.id}">
+
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label style="font-weight: 700; color: #555;">Profesional a Cargo</label>
+                        <select th:field="*{profesional.id}" class="form-control" required>
+                            <option value="">-- Seleccione Profesional --</option>
+                            <option th:each="pro : ${listaProfesionales}" 
+                                    th:value="${pro.id}" 
+                                    th:text="${pro.nombre} + ' (' + ${pro.rol} + ')'"
+                                    th:selected="${pro.id == atencion.profesional.id}"></option>
+                        </select>
+                        <span th:if="${#fields.hasErrors('profesional.id')}" th:errors="*{profesional.id}" class="error-message"></span>
+                    </div>
+
+                    <h5 style="color:#666; border-bottom:1px solid #eee; padding-bottom:5px; margin-top:20px;">Información del Caso</h5>
+                    
+                    <div class="row" style="display:flex; gap:20px; margin-bottom: 15px;">
+                        <div class="form-group" style="flex:1;">
+                            <label style="font-weight: 700; color: #555;">Categoría Deserción</label>
+                            <select th:field="*{categoriaDesercion}" class="form-control" required>
+                                <option value="">-- Seleccione --</option>
+                                <option value="Riesgo Académico">Riesgo Académico</option>
+                                <option value="Riesgo Económico">Riesgo Económico</option>
+                                <option value="Problemas de Salud">Problemas de Salud</option>
+                                <option value="Adaptación">Adaptación</option>
+                                <option value="Personal/Familiar">Personal/Familiar</option>
+                            </select>
+                            <span th:if="${#fields.hasErrors('categoriaDesercion')}" th:errors="*{categoriaDesercion}" class="error-message"></span>
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label style="font-weight: 700; color: #555;">Estado del Caso</label>
+                            <select th:field="*{estadoCaso}" class="form-control" required>
+                                <option value="Abierto">Abierto</option>
+                                <option value="En Seguimiento">En Seguimiento</option>
+                                <option value="Cerrado">Cerrado</option>
+                            </select>
+                            <span th:if="${#fields.hasErrors('estadoCaso')}" th:errors="*{estadoCaso}" class="error-message"></span>
+                        </div>
+                    </div>
+
+                    <div class="row" style="display:flex; gap:20px; margin-bottom: 15px;">
+                        <div class="form-group" style="flex:1;">
+                            <label style="font-weight: 700; color: #555;">Remitido Por</label>
+                            <input type="text" th:field="*{remitidoPor}" class="form-control" required>
+                            <span th:if="${#fields.hasErrors('remitidoPor')}" th:errors="*{remitidoPor}" class="error-message"></span>
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label style="font-weight: 700; color: #555;">Atención Familiar (Solo Menores)</label>
+                            <input type="text" id="atencionFamiliar" th:field="*{atencionFamiliar}" 
+                                   class="form-control" 
+                                   placeholder="Parentesco"
+                                   style="color: #000; font-weight: 800;">
+                        </div>
+                    </div>
+
+                    <div class="consulta-card c1">
+                        <h5 class="consulta-title" style="color:#0d47a1;">1ª Consulta</h5>
+                        <div class="row" style="display:flex; gap:15px;">
+                            <div class="form-group" style="width:200px;">
+                                <label style="font-weight:600;">Fecha</label>
+                                <input type="date" th:field="*{fechaConsulta1}" class="form-control" th:min="${minDate}">
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label style="font-weight:600;">Observaciones</label>
+                                <textarea th:field="*{observaciones1}" class="form-control" style="height:60px;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="consulta-card c2">
+                        <h5 class="consulta-title" style="color:#7b1fa2;">2ª Consulta</h5>
+                        <div class="row" style="display:flex; gap:15px;">
+                            <div class="form-group" style="width:200px;">
+                                <label style="font-weight:600;">Fecha</label>
+                                <input type="date" th:field="*{fechaConsulta2}" class="form-control" th:min="${minDate}">
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label style="font-weight:600;">Observaciones</label>
+                                <textarea th:field="*{observaciones2}" class="form-control" style="height:60px;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="consulta-card c3">
+                        <h5 class="consulta-title" style="color:#2e7d32;">3ª Consulta</h5>
+                        <div class="row" style="display:flex; gap:15px;">
+                            <div class="form-group" style="width:200px;">
+                                <label style="font-weight:600;">Fecha</label>
+                                <input type="date" th:field="*{fechaConsulta3}" class="form-control" th:min="${minDate}">
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label style="font-weight:600;">Observaciones</label>
+                                <textarea th:field="*{observaciones3}" class="form-control" style="height:60px;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 15px; margin-top: 30px;">
+                        <button type="submit" class="btn-main btn-edit" style="border: none; cursor: pointer; flex: 1; justify-content: center;">
+                            Actualizar Atención
+                        </button>
+                        
+                        <a th:href="@{/atencion}" class="btn-cancel">Cancelar</a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var edad = document.getElementById("edadAprendiz");
+            var inputFamiliar = document.getElementById("atencionFamiliar");
+            
+            if (edad && inputFamiliar) {
+                var edadNum = parseInt(edad.value);
+                if (edadNum >= 18) {
+                    // Si ya tiene un valor, no lo deshabilitamos para que se pueda leer/editar si fue un error
+                    if (!inputFamiliar.value) {
+                        inputFamiliar.disabled = true;
+                        inputFamiliar.placeholder = "No aplica (Mayor de edad)";
+                        inputFamiliar.style.backgroundColor = "#e9ecef";
+                        inputFamiliar.style.cursor = "not-allowed";
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -11,6 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -43,6 +45,7 @@ public class AprendizExcelService {
             List<Aprendiz> aprendices = new ArrayList<>();
 
             int rowNumber = 0;
+
             while (rows.hasNext()) {
                 Row currentRow = rows.next();
 
@@ -52,54 +55,80 @@ public class AprendizExcelService {
                     continue;
                 }
 
-                // Evitar filas vacías
-                if (currentRow.getCell(0) == null || currentRow.getCell(0).getStringCellValue().isEmpty()) {
+                // Verificar si la fila está vacía
+                if (currentRow.getCell(0) == null || getCellValue(currentRow, 0).isEmpty()) {
                     break;
                 }
 
                 Aprendiz aprendiz = new Aprendiz();
 
-                // Asumiendo orden de columnas: 
-                // 0:Nombres, 1:Apellidos, 2:TipoDoc, 3:NumDoc, 4:Correo, 5:Celular, 6:Etapa, 7:CodigoFicha
-                
+                // 0: Nombres
                 aprendiz.setNombres(getCellValue(currentRow, 0));
-                aprendiz.setApellidos(getCellValue(currentRow, 1));
-                aprendiz.setTipoDocumento(getCellValue(currentRow, 2));
-                
-                // Convertir documento a string sin decimales si viene como número
-                String doc = getCellValue(currentRow, 3);
-                aprendiz.setNumeroDocumento(doc.replace(".", "").replace(",", ""));
-                
-                aprendiz.setCorreo(getCellValue(currentRow, 4));
-                aprendiz.setCelular(getCellValue(currentRow, 5));
-                aprendiz.setEtapaFormacion(getCellValue(currentRow, 6));
 
-                // Buscar Ficha por Código
-                String codigoFicha = getCellValue(currentRow, 7);
-                Ficha ficha = fichaRepository.findByCodigo(codigoFicha);
-                
-                if (ficha == null) {
-                    throw new RuntimeException("Ficha no encontrada: " + codigoFicha + " en la fila " + (rowNumber + 1));
+                // 1: Apellidos
+                aprendiz.setApellidos(getCellValue(currentRow, 1));
+
+                // 2: Tipo Doc
+                aprendiz.setTipoDocumento(getCellValue(currentRow, 2));
+
+                // 3: Número Doc
+                String numDoc = getCellValue(currentRow, 3)
+                        .replace(".", "")
+                        .replace(",", "")
+                        .trim();
+                aprendiz.setNumeroDocumento(numDoc);
+
+                // 4: Fecha Nacimiento (string con formato yyyy-MM-dd)
+                String fechaTexto = getCellValue(currentRow, 4);
+                try {
+                    aprendiz.setFechaNacimiento(LocalDate.parse(fechaTexto));
+                } catch (DateTimeParseException e) {
+                    throw new RuntimeException(
+                        "Formato de fecha inválido en fila " + (rowNumber + 1)
+                        + ". Debe ser yyyy-MM-dd. Se recibió: " + fechaTexto
+                    );
                 }
+
+                // 5: Correo
+                aprendiz.setCorreo(getCellValue(currentRow, 5));
+
+                // 6: Celular
+                aprendiz.setCelular(getCellValue(currentRow, 6));
+
+                // 7: Etapa formación
+                aprendiz.setEtapaFormacion(getCellValue(currentRow, 7));
+
+                // 8: Código Ficha
+                String codigoFicha = getCellValue(currentRow, 8);
+                Ficha ficha = fichaRepository.findByCodigo(codigoFicha);
+
+                if (ficha == null) {
+                    throw new RuntimeException(
+                        "Ficha no encontrada: " + codigoFicha +
+                        " en la fila " + (rowNumber + 1)
+                    );
+                }
+
                 aprendiz.setFicha(ficha);
 
                 aprendices.add(aprendiz);
                 rowNumber++;
             }
+
             workbook.close();
             return aprendices;
+
         } catch (IOException e) {
             throw new RuntimeException("Error al procesar Excel: " + e.getMessage());
         }
     }
 
-    // Método auxiliar para evitar NullPointer y manejar tipos de celda
+    // 🔥 Método universal — evita TODOS los errores de tipos de celda
     private String getCellValue(Row row, int cellIndex) {
         Cell cell = row.getCell(cellIndex);
         if (cell == null) return "";
-        
-        // Forzar lectura como String
-        cell.setCellType(CellType.STRING);
-        return cell.getStringCellValue().trim();
+
+        DataFormatter formatter = new DataFormatter();
+        return formatter.formatCellValue(cell).trim();
     }
 }

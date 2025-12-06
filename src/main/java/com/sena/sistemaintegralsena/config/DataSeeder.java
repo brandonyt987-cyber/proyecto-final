@@ -65,20 +65,6 @@ public class DataSeeder {
 
             usuarioRepository.save(admin1);
         }
-        
-        // --- Administrador 2 ---
-        if (!usuarioRepository.existsByEmail("admin2@sena.edu.co")) {
-
-            Usuario admin2 = new Usuario();
-            admin2.setNombre("Administrador Secundario");
-            admin2.setEmail("admin2@sena.edu.co");
-            admin2.setPassword(passwordEncoder.encode("Nala123*"));
-            admin2.setEnabled(true);
-
-            // Asignamos el nombre del rol simple (ADMIN)
-            admin2.setRol(rolAdmin.getNombre());
-
-            usuarioRepository.save(admin2);
-        }
+           
     }
 }

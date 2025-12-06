@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Gestión de Coordinaciones</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="icon" type="image/png" th:href="@{/img/logo-sena.png}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    
+    <style>
+        .search-input {
+            padding: 10px 20px;
+            border-radius: 50px; /* Píldora */
+            border: 1px solid #ccc;
+            outline: none;
+            font-size: 0.9rem;
+            width: 250px; /* Ancho fijo */
+            transition: all 0.3s ease;
+        }
+        .search-input:focus {
+            border-color: #6A11CB;
+            box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1);
+        }
+        .header-tools {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    
+    <div th:replace="~{dashboard :: sidebar}"></div>
+    
+    <div class="main-content">
+        <header th:replace="~{dashboard :: header-top}"></header>
+
+        <div class="dashboard-area">
+            
+            <div class="actions-header">
+                <h3>Coordinaciones</h3>
+                
+                <div class="header-tools">
+                    <input type="text" id="searchInput" class="search-input" onkeyup="filtrarTabla()" placeholder="Buscar coordinación...">
+                    
+                    <a sec:authorize="hasRole('ADMIN')" 
+                       th:href="@{/coordinaciones/crear}" 
+                       class="btn-main btn-create">
+                        + Nueva Coordinación
+                    </a>
+                </div>
+            </div>
+
+            <div th:if="${exito}" style="margin-bottom: 20px; text-align: center; color: green; font-weight: bold;">
+                <span th:text="${exito}"></span>
+            </div>
+            <div th:if="${error}" style="margin-bottom: 20px; text-align: center; color: red; font-weight: bold;">
+                <span th:text="${error}"></span>
+            </div>
+
+            <div class="table-container">
+                <table class="crud-table" id="tablaDatos">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px; text-align: center;">ID</th>
+                            <th>Nombre de la Coordinación</th>
+                            <th sec:authorize="hasRole('ADMIN')" class="center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="c : ${coordinaciones}">
+                            <td style="text-align: center; font-weight: bold;" th:text="${c.id}"></td>
+                            <td th:text="${c.nombre}"></td>
+                            
+                            <td sec:authorize="hasRole('ADMIN')" class="center">
+                                <div class="action-buttons">
+                                    <a th:href="@{/coordinaciones/editar/{id}(id=${c.id})}" class="btn-table-action btn-edit">Editar</a>
+                                    <a th:href="@{/coordinaciones/eliminar/{id}(id=${c.id})}" class="btn-table-action btn-delete" onclick="return confirm('¿Eliminar?')">Eliminar</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr id="noResults" style="display:none;">
+                            <td colspan="3" style="text-align:center; padding: 20px; color: #666;">No se encontraron resultados.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function filtrarTabla() {
+            var input, filter, table, tr, td, i, j, visible;
+            input = document.getElementById("searchInput");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("tablaDatos");
+            tr = table.getElementsByTagName("tr");
+            var noResults = document.getElementById("noResults");
+            var hayResultados = false;
+
+            // Recorremos todas las filas (empezando en 1 para saltar el encabezado)
+            for (i = 1; i < tr.length; i++) {
+                if (tr[i].id === "noResults") continue; // Saltar la fila de mensaje
+                
+                visible = false;
+                td = tr[i].getElementsByTagName("td");
+                
+                // Buscamos en todas las columnas de la fila
+                for (j = 0; j < td.length; j++) {
+                    if (td[j]) {
+                        if (td[j].textContent.toUpperCase().indexOf(filter) > -1) {
+                            visible = true;
+                            break; // Si encuentra coincidencia en una columna, muestra la fila
+                        }
+                    }
+                }
+                
+                if (visible) {
+                    tr[i].style.display = "";
+                    hayResultados = true;
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+            
+            // Mostrar mensaje si no hay nada
+            if (!hayResultados && filter !== "") {
+                noResults.style.display = "table-row";
+            } else {
+                noResults.style.display = "none";
+            }
+        }
+    </script>
+
+</body>
+</html>
