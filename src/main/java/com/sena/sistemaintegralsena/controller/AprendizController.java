@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDate; // 👈 Importante
+import java.time.LocalDate;
 
 @Controller
 @RequestMapping("/aprendices")
@@ -31,10 +31,7 @@ public class AprendizController {
         this.excelService = excelService;
     }
 
-    // MÉTODO AUXILIAR PARA LA EDAD
     private void configurarLimiteEdad(Model model) {
-        // La fecha máxima de nacimiento permitida es HOY - 16 AÑOS
-        // Ejemplo: Si hoy es 2025, la fecha max es 2009. Alguien nacido en 2010 tendría 15.
         LocalDate maxDate = LocalDate.now().minusYears(16);
         model.addAttribute("maxDate", maxDate);
     }
@@ -49,8 +46,9 @@ public class AprendizController {
     @GetMapping("/crear")
     public String formCrear(Model model) {
         model.addAttribute("aprendiz", new Aprendiz());
-        model.addAttribute("fichas", fichaService.listarTodas());
-        configurarLimiteEdad(model); // 👈 Enviar restricción
+        // Solo fichas activas
+        model.addAttribute("fichas", fichaService.listarTodas()); 
+        configurarLimiteEdad(model); 
         return "aprendices/crear";
     }
 
@@ -59,7 +57,7 @@ public class AprendizController {
     public String guardar(@Valid @ModelAttribute Aprendiz aprendiz, BindingResult result, Model model, RedirectAttributes redirect) {
         if (result.hasErrors()) {
             model.addAttribute("fichas", fichaService.listarTodas());
-            configurarLimiteEdad(model); // 👈 Re-enviar si falla
+            configurarLimiteEdad(model); 
             return "aprendices/crear";
         }
         try {
@@ -68,7 +66,7 @@ public class AprendizController {
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("fichas", fichaService.listarTodas());
-            configurarLimiteEdad(model); // 👈 Re-enviar si falla
+            configurarLimiteEdad(model); 
             return "aprendices/crear";
         }
         return "redirect:/aprendices";
@@ -81,7 +79,7 @@ public class AprendizController {
         if (aprendiz == null) return "redirect:/aprendices";
         model.addAttribute("aprendiz", aprendiz);
         model.addAttribute("fichas", fichaService.listarTodas());
-        configurarLimiteEdad(model); // 👈 Enviar restricción
+        configurarLimiteEdad(model); 
         return "aprendices/editar";
     }
 
@@ -105,24 +103,19 @@ public class AprendizController {
         return "redirect:/aprendices";
     }
 
+    // CAMBIO: Estado
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/eliminar/{id}")
-    public String eliminar(@PathVariable Long id, RedirectAttributes redirect) {
-        try {
-            aprendizService.eliminar(id);
-            redirect.addFlashAttribute("exito", "Aprendiz eliminado.");
-        } catch (Exception e) {
-            redirect.addFlashAttribute("error", "No se puede eliminar.");
-        }
+    @GetMapping("/cambiar-estado/{id}")
+    public String cambiarEstado(@PathVariable Long id, RedirectAttributes redirect) {
+        aprendizService.cambiarEstado(id);
+        redirect.addFlashAttribute("exito", "Estado del aprendiz actualizado.");
         return "redirect:/aprendices";
     }
 
-    // ... (Métodos de importación se mantienen igual)
+    // Métodos de importación (Iguales)
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/importar")
-    public String vistaImportar() {
-        return "aprendices/importar";
-    }
+    public String vistaImportar() { return "aprendices/importar"; }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/upload")

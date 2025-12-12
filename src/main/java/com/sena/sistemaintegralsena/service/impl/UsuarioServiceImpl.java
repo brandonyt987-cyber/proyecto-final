@@ -19,7 +19,7 @@ import java.util.List;
 public class UsuarioServiceImpl implements UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
-    private final RolRepository rolRepository; // Necesario para buscar el nombre del rol al editar
+    private final RolRepository rolRepository; 
     private final PasswordEncoder passwordEncoder;
 
     public UsuarioServiceImpl(UsuarioRepository usuarioRepository, RolRepository rolRepository, PasswordEncoder passwordEncoder) {
@@ -38,17 +38,15 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setEmail(registroDTO.getEmail());
         usuario.setPassword(passwordEncoder.encode(registroDTO.getPassword()));
         usuario.setRol(rolNombre);
-        usuario.setEnabled(true);
+        usuario.setEnabled(true); 
         usuarioRepository.save(usuario);
     }
 
-    // 🆕 IMPLEMENTACIÓN DE ACTUALIZAR
     @Override
     public void actualizarUsuarioDesdeDTO(UsuarioEdicionDTO dto) throws EmailExistenteException {
         Usuario usuarioActual = usuarioRepository.findById(dto.getId())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // Validar unicidad de email (solo si cambió)
         if (!usuarioActual.getEmail().equals(dto.getEmail()) && usuarioRepository.existsByEmail(dto.getEmail())) {
             throw new EmailExistenteException("El email " + dto.getEmail() + " ya está en uso.");
         }
@@ -56,11 +54,9 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuarioActual.setNombre(dto.getNombre());
         usuarioActual.setEmail(dto.getEmail());
 
-        // Actualizar Rol
         Rol rol = rolRepository.findById(dto.getRolId()).orElseThrow(() -> new RuntimeException("Rol no encontrado"));
         usuarioActual.setRol(rol.getNombre());
 
-        // Actualizar Contraseña solo si viene con datos
         if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
             usuarioActual.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
@@ -69,13 +65,30 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public List<Usuario> listarTodos() { return usuarioRepository.findAll(Sort.by(Sort.Direction.ASC, "id")); }
+    @Transactional(readOnly = true)
+    public List<Usuario> listarTodos() { 
+        return usuarioRepository.findAll(Sort.by(Sort.Direction.ASC, "id")); 
+    }
 
     @Override
-    public Usuario buscarPorId(Long id) { return usuarioRepository.findById(id).orElse(null); }
+    @Transactional(readOnly = true)
+    public Usuario buscarPorId(Long id) { 
+        return usuarioRepository.findById(id).orElse(null); 
+    }
 
+    
     @Override
-    public void eliminar(Long id) { usuarioRepository.deleteById(id); }
+    public void cambiarEstado(Long id, String emailSolicitante) {
+        Usuario usuario = usuarioRepository.findById(id).orElse(null);
+        if (usuario != null) {
+            
+            if (usuario.getEmail().equals(emailSolicitante)) {
+                throw new RuntimeException("No puedes desactivar tu propia cuenta.");
+            }
+            usuario.setEnabled(!usuario.isEnabled());
+            usuarioRepository.save(usuario);
+        }
+    }
 
     @Override
     public Long totalUsuarios() { return usuarioRepository.count(); }

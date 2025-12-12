@@ -1,7 +1,7 @@
 package com.sena.sistemaintegralsena.controller;
 
 import com.sena.sistemaintegralsena.entity.Ficha;
-import com.sena.sistemaintegralsena.service.CoordinacionService; // 👈 Nuevo Import
+import com.sena.sistemaintegralsena.service.CoordinacionService;
 import com.sena.sistemaintegralsena.service.FichaService;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,7 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class FichaController {
 
     private final FichaService fichaService;
-    private final CoordinacionService coordinacionService; // 👈 Nuevo Servicio
+    private final CoordinacionService coordinacionService; 
 
     public FichaController(FichaService fichaService, CoordinacionService coordinacionService) {
         this.fichaService = fichaService;
@@ -35,7 +35,7 @@ public class FichaController {
     @GetMapping("/crear")
     public String formCrear(Model model) {
         model.addAttribute("ficha", new Ficha());
-        // 👇 Enviamos las coordinaciones al select
+        // Solo mostrar coordinaciones activas si implementaste el filtro, sino listarTodas()
         model.addAttribute("coordinaciones", coordinacionService.listarTodas());
         return "fichas/crear";
     }
@@ -48,7 +48,6 @@ public class FichaController {
                                Model model, 
                                RedirectAttributes redirect) {
         if (result.hasErrors()) {
-            // 👇 Si falla, recargamos la lista para que el select no quede vacío
             model.addAttribute("coordinaciones", coordinacionService.listarTodas());
             return "fichas/crear";
         }
@@ -71,7 +70,6 @@ public class FichaController {
         if (ficha == null) return "redirect:/fichas";
         
         model.addAttribute("ficha", ficha);
-        // 👇 Enviamos las coordinaciones al select
         model.addAttribute("coordinaciones", coordinacionService.listarTodas());
         return "fichas/editar";
     }
@@ -98,16 +96,12 @@ public class FichaController {
         return "redirect:/fichas";
     }
 
-    // 6. ELIMINAR
+    // 6. CAMBIAR ESTADO (Nuevo Endpoint)
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/eliminar/{id}")
-    public String eliminarFicha(@PathVariable Long id, RedirectAttributes redirect) {
-        try {
-            fichaService.eliminar(id);
-            redirect.addFlashAttribute("exito", "Ficha eliminada.");
-        } catch (Exception e) {
-            redirect.addFlashAttribute("error", "No se puede eliminar la ficha porque tiene aprendices asociados.");
-        }
+    @GetMapping("/cambiar-estado/{id}")
+    public String cambiarEstado(@PathVariable Long id, RedirectAttributes redirect) {
+        fichaService.cambiarEstado(id);
+        redirect.addFlashAttribute("exito", "Estado de la ficha actualizado.");
         return "redirect:/fichas";
     }
 }

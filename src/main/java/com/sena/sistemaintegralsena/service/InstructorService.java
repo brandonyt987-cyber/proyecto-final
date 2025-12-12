@@ -7,7 +7,6 @@ public interface InstructorService {
     List<Instructor> listarTodos();
     void guardar(Instructor instructor);
     Instructor buscarPorId(Long id);
-    void eliminar(Long id);
-    
+    void cambiarEstado(Long id); 
     long totalInstructores();
 }

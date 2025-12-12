@@ -6,13 +6,15 @@ import java.util.List;
 
 public interface AprendizRepository extends JpaRepository<Aprendiz, Long> {
     
-    // Para validar duplicados antes de guardar
     boolean existsByNumeroDocumento(String numeroDocumento);
     boolean existsByCorreo(String correo);
 
-    // Para buscar un aprendiz específico (útil para Comités)
     Aprendiz findByNumeroDocumento(String numeroDocumento);
 
-    // Para listar todos los aprendices de una Ficha específica
+    // Listar todos por ficha
     List<Aprendiz> findByFichaId(Long fichaId);
+    
+    // Listar solo activos por ficha (Para los desplegables de Comités)
+    List<Aprendiz> findByFichaIdAndActivoTrue(Long fichaId);
+    boolean existsByFichaIdAndEsVoceroTrueAndActivoTrue(Long fichaId);
 }

@@ -29,7 +29,7 @@ public class AprendizServiceImpl implements AprendizService {
     @Override
     public void guardar(Aprendiz aprendiz) {
         
-        // 1. VALIDACIÓN DE EDAD MÍNIMA (16 AÑOS)
+        // 1. VALIDACIÓN EDAD (16 AÑOS)
         if (aprendiz.getFechaNacimiento() != null) {
             int edad = Period.between(aprendiz.getFechaNacimiento(), LocalDate.now()).getYears();
             if (edad < 16) {
@@ -37,7 +37,27 @@ public class AprendizServiceImpl implements AprendizService {
             }
         }
 
-        // 2. Validaciones de duplicados (solo si es nuevo)
+        // 2. VALIDACIÓN VOCERO ÚNICO POR FICHA
+        // Si se marca como vocero...
+        if (aprendiz.isEsVocero()) {
+            boolean yaExisteVocero = aprendizRepository.existsByFichaIdAndEsVoceroTrueAndActivoTrue(aprendiz.getFicha().getId());
+            
+            // Si es NUEVO y ya hay vocero pos manda Error
+            if (aprendiz.getId() == null && yaExisteVocero) {
+                throw new RuntimeException("La ficha " + aprendiz.getFicha().getCodigo() + " ya tiene un vocero activo.");
+            }
+            
+            // Si es EDICIÓN, verificamos que no sea él mismo el vocero existente
+            if (aprendiz.getId() != null) {
+                Aprendiz voceroActual = aprendizRepository.findById(aprendiz.getId()).orElse(null);
+                // Si antes NO era vocero, y ahora quiere serlo, pero YA hay otro debe mostrar Error jsjs
+                if (voceroActual != null && !voceroActual.isEsVocero() && yaExisteVocero) {
+                    throw new RuntimeException("La ficha ya tiene un vocero activo. Desmarque al anterior primero.");
+                }
+            }
+        }
+
+        // 3. DUPLICADOS (Solo al crear)
         if (aprendiz.getId() == null) {
             if (aprendizRepository.existsByNumeroDocumento(aprendiz.getNumeroDocumento())) {
                 throw new RuntimeException("El documento " + aprendiz.getNumeroDocumento() + " ya está registrado.");
@@ -61,9 +81,18 @@ public class AprendizServiceImpl implements AprendizService {
         return aprendizRepository.findByNumeroDocumento(documento);
     }
 
+    
     @Override
-    public void eliminar(Long id) {
-        aprendizRepository.deleteById(id);
+    public void cambiarEstado(Long id) {
+        Aprendiz aprendiz = aprendizRepository.findById(id).orElse(null);
+        if (aprendiz != null) {
+            // Si lo inactivan y era vocero, deja de ser vocero automáticamente Pilitos con esto XD
+            if (aprendiz.isActivo() && aprendiz.isEsVocero()) {
+                aprendiz.setEsVocero(false); 
+            }
+            aprendiz.setActivo(!aprendiz.isActivo());
+            aprendizRepository.save(aprendiz);
+        }
     }
 
     @Override

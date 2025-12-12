@@ -12,6 +12,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/coordinaciones")
+@PreAuthorize("hasAnyRole('ADMIN', 'PSICOLOGA', 'T_SOCIAL')")
 public class CoordinacionController {
 
     private final CoordinacionService service;
@@ -69,15 +70,12 @@ public class CoordinacionController {
         return "redirect:/coordinaciones";
     }
 
+    
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/eliminar/{id}")
-    public String eliminar(@PathVariable Long id, RedirectAttributes redirect) {
-        try {
-            service.eliminar(id);
-            redirect.addFlashAttribute("exito", "Coordinación eliminada.");
-        } catch (Exception e) {
-            redirect.addFlashAttribute("error", "No se puede eliminar (posiblemente esté en uso).");
-        }
+    @GetMapping("/cambiar-estado/{id}")
+    public String cambiarEstado(@PathVariable Long id, RedirectAttributes redirect) {
+        service.cambiarEstado(id);
+        redirect.addFlashAttribute("exito", "Estado de la coordinación actualizado.");
         return "redirect:/coordinaciones";
     }
 }

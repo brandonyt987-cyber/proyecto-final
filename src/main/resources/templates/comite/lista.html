@@ -4,34 +4,17 @@
     <title>Comités de Evaluación</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <link rel="icon" type="image/png" th:href="@{/img/logo-sena.png}">
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
-    
     <style>
-        /* Estilos para tabla ancha con scroll normal */
-        .table-container {
-            overflow-x: auto; /* Habilita la barra de desplazamiento abajo */
-        }
-        .crud-table {
-            min-width: 1600px; /* Fuerza que la tabla sea ancha para que aparezca el scroll */
-        }
-        
-        /* Ajuste básico para la columna de acciones (SIN STICKY) */
-        .crud-table th:last-child, 
-        .crud-table td:last-child {
-            min-width: 170px;    /* Espacio para que quepan los botones */
-            white-space: nowrap; /* Que no se rompan los botones */
-            text-align: center;
-        }
-
-        /* Estilos Buscador */
+        .table-container { overflow-x: auto; }
+        .crud-table { min-width: 1600px; }
+        .crud-table th:last-child, .crud-table td:last-child { min-width: 170px; white-space: nowrap; text-align: center; }
         .header-tools { display: flex; gap: 15px; align-items: center; }
-        .search-input {
-            padding: 10px 20px; border-radius: 50px; border: 1px solid #ccc;
-            outline: none; font-size: 0.9rem; width: 250px; transition: all 0.3s;
-        }
+        .search-input { padding: 10px 20px; border-radius: 50px; border: 1px solid #ccc; outline: none; width: 250px; transition: all 0.3s; }
         .search-input:focus { border-color: #6A11CB; box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1); }
+        .estado-activo { color: #2ecc71; font-weight: bold; background: rgba(46, 204, 113, 0.1); padding: 5px 10px; border-radius: 15px; font-size: 0.85em; }
+        .estado-inactivo { color: #e74c3c; font-weight: bold; background: rgba(231, 76, 60, 0.1); padding: 5px 10px; border-radius: 15px; font-size: 0.85em; }
     </style>
 </head>
 <body>
@@ -45,13 +28,9 @@
             
             <div class="actions-header">
                 <h3>Comités de Evaluación</h3>
-                
                 <div class="header-tools">
                     <input type="text" id="searchInput" class="search-input" onkeyup="filtrarTabla()" placeholder="Buscar comité...">
-                    
-                    <a th:href="@{/comite/crear}" class="btn-main btn-create">
-                        + Nuevo Comité
-                    </a>
+                    <a th:href="@{/comite/crear}" class="btn-main btn-create">+ Nuevo Comité</a>
                 </div>
             </div>
 
@@ -66,44 +45,32 @@
                             <th class="center" style="width: 50px;">ID</th>
                             <th>Fecha</th>
                             <th>Aprendiz</th>
-                            <th>Ficha</th>
-                            
+                            <th>Ubicación</th> <th>Ficha</th>
                             <th>Coordinación</th>
                             <th>Instructor</th>
-                            
                             <th>Falta</th>
                             <th>Motivo</th>
-                            <th>Recomendación</th>
-                            <th>Plan Mejoramiento</th>
-                            <th>Fecha Plazo</th>
-                            <th class="center">Paz y Salvo</th>
-                            
+                            <th class="center">Estado</th>
                             <th class="center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr th:each="c : ${comites}">
-                            
                             <td class="center" style="font-weight:bold;" th:text="${c.id}"></td>
                             <td th:text="${c.fecha}"></td>
                             <td th:text="${c.aprendiz?.nombreCompleto ?: '---'}"></td>
                             
-                            <td>
-                                <span class="badge-info" th:text="${c.aprendiz?.ficha?.codigo ?: 'N/A'}"></span>
-                            </td>
+                            <td th:text="${c.ubicacion}"></td>
                             
+                            <td><span class="badge-info" th:text="${c.aprendiz?.ficha?.codigo ?: 'N/A'}"></span></td>
                             <td th:text="${c.coordinacion.nombre}"></td>
                             <td th:text="${c.instructor.nombreCompleto}"></td>
-                            
                             <td th:text="${c.tipoFalta}"></td>
                             <td th:text="${#strings.abbreviate(c.motivo, 20)}" th:title="${c.motivo}"></td>
-                            <td th:text="${#strings.abbreviate(c.recomendacion, 20)}" th:title="${c.recomendacion}"></td>
-                            <td th:text="${#strings.abbreviate(c.planMejoramiento, 20)}" th:title="${c.planMejoramiento}"></td>
-                            <td th:text="${c.fechaPlazo}"></td>
                             
-                            <td class="center">
-                                <span th:if="${c.pazSalvo}" style="color:green; font-weight:bold;">SÍ</span>
-                                <span th:unless="${c.pazSalvo}" style="color:red; font-weight:bold;">NO</span>
+                            <td>
+                                <span th:if="${c.activo}" class="estado-activo">Activo</span>
+                                <span th:unless="${c.activo}" class="estado-inactivo">Inactivo</span>
                             </td>
                             
                             <td class="center">
@@ -111,62 +78,38 @@
                                     <a th:href="@{/comite/editar/{id}(id=${c.id})}" class="btn-table-action btn-edit">Editar</a>
                                     
                                     <div sec:authorize="hasRole('ADMIN')" style="display:inline;">
-                                        <a th:href="@{/comite/eliminar/{id}(id=${c.id})}" 
-                                           class="btn-table-action btn-delete"
-                                           onclick="return confirm('¿Eliminar registro?')">Eliminar</a>
+                                        <a th:href="@{/comite/cambiar-estado/{id}(id=${c.id})}" 
+                                           class="btn-table-action"
+                                           th:classappend="${c.activo} ? 'btn-delete' : 'btn-create'"
+                                           th:text="${c.activo} ? 'Inactivar' : 'Activar'">
+                                        </a>
                                     </div>
                                 </div>
                             </td>
                         </tr>
-                        <tr id="noResults" style="display:none;">
-                            <td colspan="13" style="text-align:center; padding: 20px; color: #666;">No se encontraron resultados.</td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
-            
-            <div th:if="${#lists.isEmpty(comites)}" style="text-align:center; padding:30px; color:#666;">
-                No hay comités registrados.
-            </div>
-
         </div>
     </div>
-
     <script>
         function filtrarTabla() {
-            var input, filter, table, tr, td, i, j, visible;
-            input = document.getElementById("searchInput");
-            filter = input.value.toUpperCase();
-            table = document.getElementById("tablaDatos");
-            tr = table.getElementsByTagName("tr");
-            var noResults = document.getElementById("noResults");
-            var hayResultados = false;
-
-            for (i = 1; i < tr.length; i++) {
-                if (tr[i].id === "noResults") continue;
-                visible = false;
-                td = tr[i].getElementsByTagName("td");
-                for (j = 0; j < td.length; j++) {
+            var input = document.getElementById("searchInput");
+            var filter = input.value.toUpperCase();
+            var table = document.getElementById("tablaDatos");
+            var tr = table.getElementsByTagName("tr");
+            for (var i = 1; i < tr.length; i++) {
+                var visible = false;
+                var td = tr[i].getElementsByTagName("td");
+                for (var j = 0; j < td.length; j++) {
                     if (td[j] && td[j].textContent.toUpperCase().indexOf(filter) > -1) {
                         visible = true;
                         break;
                     }
                 }
-                if (visible) {
-                    tr[i].style.display = "";
-                    hayResultados = true;
-                } else {
-                    tr[i].style.display = "none";
-                }
-            }
-            
-            if (!hayResultados && filter !== "") {
-                noResults.style.display = "table-row";
-            } else {
-                noResults.style.display = "none";
+                if (visible) tr[i].style.display = ""; else tr[i].style.display = "none";
             }
         }
     </script>
-
 </body>
 </html>

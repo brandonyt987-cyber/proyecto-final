@@ -11,8 +11,7 @@ public interface FichaService {
     
     Ficha buscarPorId(Long id);
     
-    void eliminar(Long id);
+    void cambiarEstado(Long id);
     
-    // 🔑 ESTE ES EL MÉTODO QUE FALTABA
     long totalFichas();
 }

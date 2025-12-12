@@ -4,29 +4,18 @@
     <title>Gestión de Fichas</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <link rel="icon" type="image/png" th:href="@{/img/logo-sena.png}">
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
-    
     <style>
-        .header-tools {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
+        .header-tools { display: flex; gap: 15px; align-items: center; }
         .search-input {
-            padding: 10px 20px;
-            border-radius: 50px;
-            border: 1px solid #ccc;
-            outline: none;
-            font-size: 0.9rem;
-            width: 250px;
-            transition: all 0.3s ease;
+            padding: 10px 20px; border-radius: 50px; border: 1px solid #ccc;
+            outline: none; font-size: 0.9rem; width: 250px; transition: all 0.3s ease;
         }
-        .search-input:focus {
-            border-color: #6A11CB;
-            box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1);
-        }
+        .search-input:focus { border-color: #6A11CB; box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1); }
+        
+        .estado-activo { color: #2ecc71; font-weight: bold; background: rgba(46, 204, 113, 0.1); padding: 5px 10px; border-radius: 15px; font-size: 0.85em; }
+        .estado-inactivo { color: #e74c3c; font-weight: bold; background: rgba(231, 76, 60, 0.1); padding: 5px 10px; border-radius: 15px; font-size: 0.85em; }
     </style>
 </head>
 <body>
@@ -40,15 +29,9 @@
             
             <div class="actions-header">
                 <h3>Gestión de Fichas</h3>
-                
                 <div class="header-tools">
                     <input type="text" id="searchInput" class="search-input" onkeyup="filtrarTabla()" placeholder="Buscar ficha...">
-                    
-                    <a sec:authorize="hasRole('ADMIN')" 
-                       th:href="@{/fichas/crear}" 
-                       class="btn-main btn-create">
-                        + Nueva Ficha
-                    </a>
+                    <a sec:authorize="hasRole('ADMIN')" th:href="@{/fichas/crear}" class="btn-main btn-create">+ Nueva Ficha</a>
                 </div>
             </div>
 
@@ -68,7 +51,7 @@
                             <th>Programa</th>
                             <th>Jornada</th>
                             <th>Coordinación</th>
-                            <th sec:authorize="hasRole('ADMIN')" class="center">Acciones</th>
+                            <th>Estado</th> <th sec:authorize="hasRole('ADMIN')" class="center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -76,27 +59,32 @@
                             <td style="text-align: center; font-weight: bold;" th:text="${f.id}"></td>
                             <td th:text="${f.codigo}" style="font-weight: bold; color: #2c3e50;"></td>
                             <td th:text="${f.programa}"></td>
-                            <td>
-                                <span class="badge-info" th:text="${f.jornada}"></span>
-                            </td>
+                            <td><span class="badge-info" th:text="${f.jornada}"></span></td>
                             <td th:text="${f.coordinacion.nombre}"></td>
+                            
+                            <td>
+                                <span th:if="${f.activo}" class="estado-activo">Activo</span>
+                                <span th:unless="${f.activo}" class="estado-inactivo">Inactivo</span>
+                            </td>
                             
                             <td sec:authorize="hasRole('ADMIN')" class="center">
                                 <div class="action-buttons">
                                     <a th:href="@{/fichas/editar/{id}(id=${f.id})}" class="btn-table-action btn-edit">Editar</a>
-                                    <a th:href="@{/fichas/eliminar/{id}(id=${f.id})}" 
-                                       class="btn-table-action btn-delete"
-                                       onclick="return confirm('¿Eliminar ficha?')">Eliminar</a>
+                                    
+                                    <a th:href="@{/fichas/cambiar-estado/{id}(id=${f.id})}" 
+                                       class="btn-table-action"
+                                       th:classappend="${f.activo} ? 'btn-delete' : 'btn-create'"
+                                       th:text="${f.activo} ? 'Inactivar' : 'Activar'">
+                                    </a>
                                 </div>
                             </td>
                         </tr>
                         <tr id="noResults" style="display:none;">
-                            <td colspan="6" style="text-align:center; padding: 20px; color: #666;">No se encontraron resultados.</td>
+                            <td colspan="7" style="text-align:center; padding: 20px; color: #666;">No se encontraron resultados.</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-
         </div>
     </div>
 
@@ -120,21 +108,12 @@
                         break;
                     }
                 }
-                if (visible) {
-                    tr[i].style.display = "";
-                    hayResultados = true;
-                } else {
-                    tr[i].style.display = "none";
-                }
+                if (visible) { tr[i].style.display = ""; hayResultados = true; } 
+                else { tr[i].style.display = "none"; }
             }
-            
-            if (!hayResultados && filter !== "") {
-                noResults.style.display = "table-row";
-            } else {
-                noResults.style.display = "none";
-            }
+            if (!hayResultados && filter !== "") { noResults.style.display = "table-row"; } 
+            else { noResults.style.display = "none"; }
         }
     </script>
-
 </body>
 </html>

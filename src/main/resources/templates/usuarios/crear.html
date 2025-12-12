@@ -6,73 +6,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" th:href="@{/img/logo-sena.png}">
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <style>
+        .error-message { color: #dc3545; font-size: 0.85rem; font-weight: 700; display: block; margin-top: 4px; }
+        .field-error { border-color: #dc3545 !important; background-color: #fff8f8 !important; }
+    </style>
 </head>
 <body>
-    
     <div th:replace="~{dashboard :: sidebar}"></div>
-    
     <div class="main-content">
         <header th:replace="~{dashboard :: header-top}"></header>
-
         <div class="dashboard-area">
             <h3 style="text-align: center; margin-bottom: 25px;">Crear Nuevo Usuario</h3>
-
             <div class="form-container">
-                
                 <div th:if="${error}" style="background: #fee2e2; color: #991b1b; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: bold;">
                     <span th:text="${error}"></span>
                 </div>
-
                 <form method="POST" th:action="@{/usuarios/guardar}" th:object="${usuarioDTO}" novalidate>
-                    
                     <div class="form-group" style="margin-bottom: 20px;">
-                        <label style="font-weight: 700; color: #555; margin-bottom: 8px; display:block;">Nombre Completo</label>
-                        <input type="text" th:field="*{nombre}" class="form-control" placeholder="Ej: Juan Pérez">
+                        <label style="font-weight: 700; color: #555;">Nombre Completo</label>
+                        <input type="text" th:field="*{nombre}" class="form-control" th:classappend="${#fields.hasErrors('nombre')} ? 'field-error'">
                         <span th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="error-message"></span>
                     </div>
-
                     <div class="form-group" style="margin-bottom: 20px;">
-                        <label style="font-weight: 700; color: #555; margin-bottom: 8px; display:block;">Correo Institucional</label>
-                        <input type="email" th:field="*{email}" class="form-control" placeholder="usuario@sena.edu.co">
+                        <label style="font-weight: 700; color: #555;">Correo Institucional</label>
+                        <input type="email" th:field="*{email}" class="form-control" th:classappend="${#fields.hasErrors('email')} ? 'field-error'">
                         <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-message"></span>
                     </div>
-
                     <div class="form-group" style="margin-bottom: 20px;">
-                        <label style="font-weight: 700; color: #555; margin-bottom: 8px; display:block;">Contraseña</label>
-                        <input type="password" th:field="*{password}" class="form-control">
+                        <label style="font-weight: 700; color: #555;">Contraseña</label>
+                        <input type="password" th:field="*{password}" class="form-control" th:classappend="${#fields.hasErrors('password')} ? 'field-error'">
                         <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error-message"></span>
                     </div>
-
                     <div class="form-group" style="margin-bottom: 20px;">
-                        <label style="font-weight: 700; color: #555; margin-bottom: 8px; display:block;">Confirmar Contraseña</label>
-                        <input type="password" th:field="*{confirmPassword}" class="form-control">
-                        
-                        <div th:if="${#fields.hasGlobalErrors()}">
-                             <span th:each="err : ${#fields.globalErrors()}" th:text="${err}" class="error-message"></span>
-                        </div>
+                        <label style="font-weight: 700; color: #555;">Confirmar Contraseña</label>
+                        <input type="password" th:field="*{confirmPassword}" class="form-control" th:classappend="${#fields.hasErrors('confirmPassword')} ? 'field-error'">
+                        <span th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}" class="error-message"></span>
                     </div>
-
                     <div class="form-group" style="margin-bottom: 30px;">
-                        <label style="font-weight: 700; color: #555; margin-bottom: 8px; display:block;">Rol</label>
-                        <select th:field="*{rolId}" class="form-control">
+                        <label style="font-weight: 700; color: #555;">Rol</label>
+                        <select th:field="*{rolId}" class="form-control" th:classappend="${#fields.hasErrors('rolId')} ? 'field-error'">
                             <option value="">-- Seleccione un Rol --</option>
                             <option th:each="r : ${roles}" th:value="${r.id}" th:text="${r.nombre}"></option>
                         </select>
                         <span th:if="${#fields.hasErrors('rolId')}" th:errors="*{rolId}" class="error-message"></span>
                     </div>
-
-                    <div style="display: flex; align-items: center; gap: 15px; margin-top: 20px;">
-    
-    <button type="submit" class="btn-main btn-create" style="border: none; cursor: pointer; min-width: 180px; justify-content: center;">
-        Guardar Usuario
-    </button>
-    
-    <a th:href="@{/usuarios}" class="btn-cancel">
-        Cancelar
-    </a>
-
-</div>
-
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <button type="submit" class="btn-main btn-create" style="border: none; cursor: pointer; min-width: 180px; justify-content: center;">Guardar Usuario</button>
+                        <a th:href="@{/usuarios}" class="btn-cancel">Cancelar</a>
+                    </div>
                 </form>
             </div>
         </div>

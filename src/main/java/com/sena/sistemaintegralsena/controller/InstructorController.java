@@ -13,6 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/instructores")
+@PreAuthorize("hasAnyRole('ADMIN', 'PSICOLOGA', 'T_SOCIAL')")
 public class InstructorController {
 
     private final InstructorService service;
@@ -83,15 +84,12 @@ public class InstructorController {
         return "redirect:/instructores";
     }
 
+    
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/eliminar/{id}")
-    public String eliminar(@PathVariable Long id, RedirectAttributes redirect) {
-        try {
-            service.eliminar(id);
-            redirect.addFlashAttribute("exito", "Instructor eliminado.");
-        } catch (Exception e) {
-            redirect.addFlashAttribute("error", "No se puede eliminar el instructor.");
-        }
+    @GetMapping("/cambiar-estado/{id}")
+    public String cambiarEstado(@PathVariable Long id, RedirectAttributes redirect) {
+        service.cambiarEstado(id);
+        redirect.addFlashAttribute("exito", "Estado del instructor actualizado.");
         return "redirect:/instructores";
     }
 }

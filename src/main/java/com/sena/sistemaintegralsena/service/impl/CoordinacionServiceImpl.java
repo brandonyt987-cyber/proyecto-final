@@ -5,6 +5,7 @@ import com.sena.sistemaintegralsena.repository.CoordinacionRepository;
 import com.sena.sistemaintegralsena.service.CoordinacionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -20,13 +21,13 @@ public class CoordinacionServiceImpl implements CoordinacionService {
     @Override
     @Transactional(readOnly = true)
     public List<Coordinacion> listarTodas() {
-        return repository.findAll();
+        return repository.findAll(Sort.by(Sort.Direction.ASC, "id"));
     }
 
     @Override
     @Transactional
     public void guardar(Coordinacion coordinacion) {
-        // Validación simple de duplicados al crear
+        
         if (coordinacion.getId() == null && repository.existsByNombre(coordinacion.getNombre())) {
              throw new RuntimeException("La coordinación '" + coordinacion.getNombre() + "' ya existe.");
         }
@@ -39,10 +40,15 @@ public class CoordinacionServiceImpl implements CoordinacionService {
         return repository.findById(id).orElse(null);
     }
 
+    // --- NUEVA LÓGICA DE ESTADO ---
     @Override
     @Transactional
-    public void eliminar(Long id) {
-        repository.deleteById(id);
+    public void cambiarEstado(Long id) {
+        Coordinacion coord = repository.findById(id).orElse(null);
+        if (coord != null) {
+            coord.setActivo(!coord.isActivo()); 
+            repository.save(coord);
+        }
     }
 
     @Override

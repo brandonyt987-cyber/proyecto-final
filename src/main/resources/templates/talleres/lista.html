@@ -11,14 +11,12 @@
     <style>
         .table-container { overflow-x: auto; }
         .sub-text { display: block; font-size: 0.85em; color: #666; margin-top: 2px; }
-        
-        /* Buscador */
         .header-tools { display: flex; gap: 15px; align-items: center; }
-        .search-input {
-            padding: 10px 20px; border-radius: 50px; border: 1px solid #ccc;
-            outline: none; font-size: 0.9rem; width: 250px; transition: all 0.3s;
-        }
+        .search-input { padding: 10px 20px; border-radius: 50px; border: 1px solid #ccc; outline: none; font-size: 0.9rem; width: 250px; transition: all 0.3s; }
         .search-input:focus { border-color: #6A11CB; box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1); }
+        
+        .estado-activo { color: #2ecc71; font-weight: bold; background: rgba(46, 204, 113, 0.1); padding: 5px 10px; border-radius: 15px; font-size: 0.85em; }
+        .estado-inactivo { color: #e74c3c; font-weight: bold; background: rgba(231, 76, 60, 0.1); padding: 5px 10px; border-radius: 15px; font-size: 0.85em; }
     </style>
 </head>
 <body>
@@ -56,7 +54,7 @@
                             <th>Profesional</th>
                             <th>Fecha / Horario</th>
                             <th class="center">Cupo</th>
-                            <th class="center">Acciones</th>
+                            <th class="center">Estado</th> <th class="center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -66,7 +64,6 @@
                             <td>
                                 <span class="badge-info" th:text="${t.ficha.codigo}"></span>
                                 <span class="sub-text" th:text="${#strings.abbreviate(t.ficha.programa, 25)}"></span>
-                                <span class="sub-text" style="font-style:italic;" th:text="${t.ficha.jornada}"></span>
                             </td>
                             <td th:text="${t.profesional.nombre}"></td>
                             <td>
@@ -76,14 +73,24 @@
                             <td class="center" th:text="${t.cupo}"></td>
                             
                             <td class="center">
+                                <span th:if="${t.activo}" class="estado-activo">Activo</span>
+                                <span th:unless="${t.activo}" class="estado-inactivo">Inactivo</span>
+                            </td>
+                            
+                            <td class="center">
                                 <div class="action-buttons">
                                     <a th:href="@{/talleres/editar/{id}(id=${t.id})}" class="btn-table-action btn-edit">Editar</a>
-                                    <a th:href="@{/talleres/eliminar/{id}(id=${t.id})}" class="btn-table-action btn-delete" onclick="return confirm('¿Eliminar Taller?')">Eliminar</a>
+                                    
+                                    <a th:href="@{/talleres/cambiar-estado/{id}(id=${t.id})}" 
+                                       class="btn-table-action"
+                                       th:classappend="${t.activo} ? 'btn-delete' : 'btn-create'"
+                                       th:text="${t.activo} ? 'Inactivar' : 'Activar'">
+                                    </a>
                                 </div>
                             </td>
                         </tr>
                         <tr id="noResults" style="display:none;">
-                            <td colspan="7" style="text-align:center; padding: 20px; color: #666;">No se encontraron resultados.</td>
+                            <td colspan="8" style="text-align:center; padding: 20px; color: #666;">No se encontraron resultados.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -116,21 +123,12 @@
                         break;
                     }
                 }
-                if (visible) {
-                    tr[i].style.display = "";
-                    hayResultados = true;
-                } else {
-                    tr[i].style.display = "none";
-                }
+                if (visible) { tr[i].style.display = ""; hayResultados = true; } 
+                else { tr[i].style.display = "none"; }
             }
-            
-            if (!hayResultados && filter !== "") {
-                noResults.style.display = "table-row";
-            } else {
-                noResults.style.display = "none";
-            }
+            if (!hayResultados && filter !== "") { noResults.style.display = "table-row"; } 
+            else { noResults.style.display = "none"; }
         }
     </script>
-
 </body>
 </html>

@@ -1,11 +1,9 @@
 package com.sena.sistemaintegralsena.dto;
 
-import com.sena.sistemaintegralsena.util.PasswordMatches; 
 import jakarta.validation.constraints.*;
-import lombok.Data; // <-- CRÍTICO: Genera los get/set para el DTO
+import lombok.Data;
 
 @Data 
-@PasswordMatches(message = "Las contraseñas no coinciden.") 
 public class UsuarioRegistroDTO {
 
     @NotEmpty(message = "El nombre es obligatorio.")
@@ -27,7 +25,5 @@ public class UsuarioRegistroDTO {
     private String confirmPassword;
 
     @NotNull(message = "Debe seleccionar un rol.")
-    private Long rolId; // Usado por getRolId()
-
-    // El @Data se encarga de generar los Getters y Setters
+    private Long rolId; 
 }

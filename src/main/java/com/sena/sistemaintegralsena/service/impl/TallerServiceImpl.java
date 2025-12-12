@@ -23,8 +23,8 @@ public class TallerServiceImpl implements TallerService {
     @Override
     @Transactional(readOnly = true)
     public List<Taller> listarTodos() {
-        // La lista sigue ordenada por fecha descendente (más nuevo primero)
-        return repository.findAll(Sort.by(Sort.Direction.DESC, "fecha"));
+        
+        return repository.findAll(Sort.by(Sort.Direction.ASC, "id"));
     }
 
     @Override
@@ -32,21 +32,16 @@ public class TallerServiceImpl implements TallerService {
         // VALIDACIÓN DE HORARIO (9:00 AM - 4:00 PM)
         if (taller.getHoraInicio() != null && taller.getHoraFin() != null) {
             
-            // 🔥 CAMBIO CRÍTICO DE RANGO: 9 AM (09:00) y 4 PM (16:00)
             LocalTime inicioPermitido = LocalTime.of(9, 0);
-            LocalTime finPermitido = LocalTime.of(16, 0);
+            LocalTime finPermitido = LocalTime.of(17, 0); 
 
-            // 1. Validar que estén dentro del rango
             if (taller.getHoraInicio().isBefore(inicioPermitido) || taller.getHoraInicio().isAfter(finPermitido)) {
-                // 🔥 MENSAJE DE ERROR ACTUALIZADO
-                throw new RuntimeException("La hora de inicio debe estar entre 9:00 AM y 4:00 PM.");
+                throw new RuntimeException("La hora de inicio debe estar entre 9:00 AM y 5:00 PM.");
             }
             if (taller.getHoraFin().isBefore(inicioPermitido) || taller.getHoraFin().isAfter(finPermitido)) {
-                // 🔥 MENSAJE DE ERROR ACTUALIZADO
-                throw new RuntimeException("La hora de fin debe estar entre 9:00 AM y 4:00 PM.");
+                throw new RuntimeException("La hora de fin debe estar entre 9:00 AM y 5:00 PM.");
             }
 
-            // 2. Validar coherencia (Fin > Inicio)
             if (taller.getHoraFin().isBefore(taller.getHoraInicio())) {
                 throw new RuntimeException("La hora de fin no puede ser anterior a la hora de inicio.");
             }
@@ -54,7 +49,6 @@ public class TallerServiceImpl implements TallerService {
                 throw new RuntimeException("El taller debe tener una duración válida.");
             }
         }
-        
         repository.save(taller);
     }
 
@@ -64,8 +58,13 @@ public class TallerServiceImpl implements TallerService {
         return repository.findById(id).orElse(null);
     }
 
+    // NUEVA LÓGICA DE ESTADO
     @Override
-    public void eliminar(Long id) {
-        repository.deleteById(id);
+    public void cambiarEstado(Long id) {
+        Taller taller = repository.findById(id).orElse(null);
+        if (taller != null) {
+            taller.setActivo(!taller.isActivo());
+            repository.save(taller);
+        }
     }
 }

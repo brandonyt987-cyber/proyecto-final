@@ -3,10 +3,8 @@ package com.sena.sistemaintegralsena.controller;
 import com.sena.sistemaintegralsena.entity.Aprendiz;
 import com.sena.sistemaintegralsena.entity.Comite;
 import com.sena.sistemaintegralsena.entity.Usuario;
-import com.sena.sistemaintegralsena.entity.Vocero;
 import com.sena.sistemaintegralsena.repository.AprendizRepository;
 import com.sena.sistemaintegralsena.repository.UsuarioRepository;
-import com.sena.sistemaintegralsena.repository.VoceroRepository;
 import com.sena.sistemaintegralsena.service.ComiteService;
 import com.sena.sistemaintegralsena.service.CoordinacionService;
 import com.sena.sistemaintegralsena.service.InstructorService;
@@ -21,7 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.time.LocalDate;
-import java.util.Comparator; // ✅ IMPORTANTE: Agregado para ordenar
+import java.util.Comparator;
 import java.util.List;
 
 @Controller
@@ -34,29 +32,19 @@ public class ComiteController {
     @Autowired private UsuarioRepository usuarioRepository;
     @Autowired private InstructorService instructorService;
     @Autowired private CoordinacionService coordinacionService;
-    @Autowired private VoceroRepository voceroRepository;
 
-    // ===========================================================
-    // 🔥 MÉTODO MODIFICADO PARA ORDEN ASCENDENTE (ID 1, 2, 3...)
-    // ===========================================================
     @GetMapping
     public String listar(Model model) {
-        // 1. Obtenemos la lista del servicio
         List<Comite> listaComites = comiteService.listarTodos();
-        
-        // 2. La ordenamos por ID de forma ASCENDENTE (del más viejo al más nuevo)
         listaComites.sort(Comparator.comparing(Comite::getId));
-        
-        // 3. Enviamos la lista ya ordenada a la vista
         model.addAttribute("comites", listaComites);
-        
         return "comite/lista";
     }
 
+    // ... (Métodos privados de configuración de fecha y modelo iguales) ...
     private void configurarLimitesFecha(Model model) {
         LocalDate today = LocalDate.now();
         LocalDate minDate, maxDate;
-
         if (today.getDayOfMonth() > 20) {
             minDate = today.plusMonths(1).withDayOfMonth(1);
             maxDate = today.plusMonths(1).withDayOfMonth(20);
@@ -64,7 +52,6 @@ public class ComiteController {
             minDate = today;
             maxDate = today.withDayOfMonth(20);
         }
-        
         model.addAttribute("minDate", minDate);
         model.addAttribute("maxDate", maxDate);
         model.addAttribute("minDatePlazo", today);
@@ -79,7 +66,8 @@ public class ComiteController {
         cargarListas(model);
         configurarLimitesFecha(model);
     }
-
+    
+    // ... (Método crear igual que antes, sin voceroRepository) ...
     @GetMapping("/crear")
     public String buscarParaCrear(@RequestParam(required = false) String documento, Model model) {
         Comite comite = new Comite();
@@ -91,28 +79,35 @@ public class ComiteController {
         
         configurarLimitesFecha(model); 
 
+        if (documento != null && documento.trim().isEmpty()) {
+            model.addAttribute("errorBusqueda", "Por favor, ingrese un número de documento.");
+            return "comite/crear";
+        }
+
         if (documento != null && !documento.isEmpty()) {
             Aprendiz aprendiz = aprendizRepository.findByNumeroDocumento(documento);
             
             if (aprendiz != null) {
-                
-                if (voceroRepository.existsByAprendizId(aprendiz.getId())) {
-                    model.addAttribute("errorBusqueda", "⚠️ EL APRENDIZ ES VOCERO. Debe realizar el cambio de vocería antes de asignarle un comité.");
+                if (aprendiz.isEsVocero()) {
+                    model.addAttribute("errorBusqueda", "EL APRENDIZ ES VOCERO. Debe realizar el cambio de vocería antes de asignarle un comité.");
                     model.addAttribute("busqueda", documento);
                     return "comite/crear";
                 }
 
                 if (aprendiz.getFicha() != null) {
-                    Vocero voceroFicha = voceroRepository.findByAprendizFichaId(aprendiz.getFicha().getId());
+                    boolean tieneVocero = aprendizRepository.existsByFichaIdAndEsVoceroTrueAndActivoTrue(aprendiz.getFicha().getId());
                     Comite comiteForm = (Comite) model.getAttribute("comite");
-                    if (voceroFicha == null) {
-                        model.addAttribute("errorBusqueda", "⚠️ LA FICHA " + aprendiz.getFicha().getCodigo() + " NO TIENE VOCERO ASIGNADO. Asigne uno primero.");
+                    
+                    if (!tieneVocero) {
+                        model.addAttribute("errorBusqueda", "LA FICHA " + aprendiz.getFicha().getCodigo() + " NO TIENE VOCERO ASIGNADO.");
                         model.addAttribute("busqueda", documento);
                         return "comite/crear"; 
+                    } else {
+                        List<Aprendiz> todos = aprendizRepository.findByFichaId(aprendiz.getFicha().getId());
+                        Aprendiz elVocero = todos.stream().filter(a -> a.isEsVocero() && a.isActivo()).findFirst().orElse(null);
+                        if(elVocero != null) comiteForm.setRepresentanteAprendices(elVocero.getNombreCompleto());
                     }
-                    comiteForm.setRepresentanteAprendices(voceroFicha.getAprendiz().getNombreCompleto());
                 }
-
                 model.addAttribute("aprendizEncontrado", aprendiz);
                 cargarListas(model);
             } else {
@@ -123,19 +118,13 @@ public class ComiteController {
         return "comite/crear";
     }
 
+    // ... (guardar, formEditar, actualizar iguales) ...
     @PostMapping("/guardar")
-    public String guardar(@Valid @ModelAttribute Comite comite, 
-                          BindingResult result,
-                          @RequestParam Long aprendizId, 
-                          Principal principal,
-                          RedirectAttributes redirect,
-                          Model model) {
-        
+    public String guardar(@Valid @ModelAttribute Comite comite, BindingResult result, @RequestParam Long aprendizId, Principal principal, RedirectAttributes redirect, Model model) {
         if (result.hasErrors()) {
             repararModeloError(model, aprendizId);
             return "comite/crear"; 
         }
-
         try {
             comiteService.guardar(comite, aprendizId, principal.getName());
             redirect.addFlashAttribute("exito", "Comité registrado correctamente.");
@@ -151,26 +140,17 @@ public class ComiteController {
     public String formEditar(@PathVariable Long id, Model model) {
         Comite comite = comiteService.buscarPorId(id);
         if (comite == null) return "redirect:/comite";
-
         model.addAttribute("comite", comite);
         repararModeloError(model, comite.getAprendiz().getId());
-
         return "comite/editar";
     }
 
     @PostMapping("/actualizar")
-    public String actualizar(@Valid @ModelAttribute Comite comite, 
-                             BindingResult result,
-                             @RequestParam Long aprendizId, 
-                             Principal principal,
-                             RedirectAttributes redirect,
-                             Model model) {
-        
+    public String actualizar(@Valid @ModelAttribute Comite comite, BindingResult result, @RequestParam Long aprendizId, Principal principal, RedirectAttributes redirect, Model model) {
         if (result.hasErrors()) {
             repararModeloError(model, aprendizId);
             return "comite/editar";
         }
-
         try {
             comiteService.guardar(comite, aprendizId, principal.getName());
             redirect.addFlashAttribute("exito", "Comité actualizado correctamente.");
@@ -182,10 +162,11 @@ public class ComiteController {
         return "redirect:/comite";
     }
 
-    @GetMapping("/eliminar/{id}")
-    public String eliminar(@PathVariable Long id, RedirectAttributes redirect) {
-        comiteService.eliminar(id);
-        redirect.addFlashAttribute("exito", "Comité eliminado.");
+    
+    @GetMapping("/cambiar-estado/{id}")
+    public String cambiarEstado(@PathVariable Long id, RedirectAttributes redirect) {
+        comiteService.cambiarEstado(id);
+        redirect.addFlashAttribute("exito", "Estado del comité actualizado.");
         return "redirect:/comite";
     }
 

@@ -64,6 +64,10 @@
                 <div class="form-group">
                     <label for="confirmPassword">Confirmar contraseña</label>
                     <input type="password" id="confirmPassword" th:field="*{confirmPassword}" class="form-control">
+                    
+                    <div class="field-error"
+                         th:if="${#fields.hasErrors('confirmPassword')}"
+                         th:errors="*{confirmPassword}"></div>
                 </div>
 
                 <div class="field-error"

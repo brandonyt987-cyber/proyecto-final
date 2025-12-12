@@ -9,7 +9,7 @@
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 
     <style>
-        /* Estilos adicionales para las tarjetas de consulta */
+        /* Tarjetas de Consultas */
         .consulta-card {
             padding: 15px;
             border-radius: 8px;
@@ -40,9 +40,24 @@
         .info-item strong { color: #555; display: block; margin-bottom: 2px; }
         .info-item span { color: #333; }
 
-        /* 🔥 ESTILO ESPECIAL PARA BOTÓN CANCELAR (GEMELO DEL GUARDAR) */
+        /* Mensajes de Error */
+        .error-message {
+            color: #dc3545; 
+            font-size: 0.85rem; 
+            font-weight: 700; 
+            display: block; 
+            margin-top: 4px;
+        }
+        
+        /* Borde rojo al fallar validación */
+        .field-error {
+            border-color: #dc3545 !important;
+            background-color: #fff8f8 !important;
+        }
+
+        /* Botón Cancelar Sólido */
         .btn-cancel-solid {
-            background: linear-gradient(135deg, #95a5a6, #7f8c8d); /* Gris Elegante */
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
             color: white !important;
             border: none;
             padding: 12px 28px;
@@ -78,7 +93,7 @@
                 <form method="GET" th:action="@{/atencion/crear}" style="margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px;">
                     <label style="font-weight: 700; color: #555; margin-bottom: 8px; display:block;">Buscar Aprendiz por Documento:</label>
                     <div style="display:flex; gap:10px;">
-                        <input type="text" name="documento" class="form-control" th:value="${busqueda}" placeholder="Ej: 1028987878" required>
+                        <input type="text" name="documento" class="form-control" th:value="${busqueda}" placeholder="Ej: 1028987878">
                         <button type="submit" class="btn-main btn-create" style="margin:0; border:none; cursor:pointer;">Buscar</button>
                     </div>
                     <div th:if="${errorBusqueda}" style="margin-top:10px; color: #e74c3c; font-weight: bold; background: #fff5f5; padding: 10px; border-radius: 8px;">
@@ -107,9 +122,9 @@
                             </div>
                             <div class="info-item">
                                 <strong>Jornada/Mod:</strong> <span th:text="${aprendizEncontrado.ficha?.jornada} + ' - ' + ${aprendizEncontrado.ficha?.modalidad}"></span><br>
-                                <strong>Contacto:</strong> <br> 
-                                📱 <span th:text="${aprendizEncontrado.celular}"></span> <br> 
-                                📧 <span th:text="${aprendizEncontrado.correo}"></span>
+                                <strong>Contacto:</strong>  
+                                Cel: <span th:text="${aprendizEncontrado.celular}"></span> <br> 
+                                Email: <span th:text="${aprendizEncontrado.correo}"></span>
                             </div>
                         </div>
                     </div>
@@ -118,12 +133,13 @@
                         <span th:text="${error}"></span>
                     </div>
 
-                    <form id="formCrearAtencion" method="POST" th:action="@{/atencion/guardar}" th:object="${atencion}" novalidate>
+                    <form id="formCrearAtencion" method="POST" th:action="@{/atencion/guardar}" th:object="${atencion}" novalidate autocomplete="off">
                         <input type="hidden" name="aprendizId" th:value="${aprendizEncontrado.id}">
 
                         <div class="form-group" style="margin-bottom: 15px;">
                             <label style="font-weight: 700; color: #555;">Profesional a Cargo</label>
-                            <select th:field="*{profesional.id}" class="form-control" required>
+                            <select th:field="*{profesional.id}" class="form-control" 
+                                    th:classappend="${#fields.hasErrors('profesional.id')} ? 'field-error'" required>
                                 <option value="">-- Seleccione Profesional --</option>
                                 <option th:each="pro : ${listaProfesionales}" 
                                         th:value="${pro.id}" 
@@ -135,7 +151,8 @@
                         <div class="row" style="display:flex; gap:20px; margin-bottom: 15px;">
                             <div class="form-group" style="flex:1;">
                                 <label style="font-weight: 700; color: #555;">Categoría Deserción</label>
-                                <select th:field="*{categoriaDesercion}" class="form-control" required>
+                                <select th:field="*{categoriaDesercion}" class="form-control" 
+                                        th:classappend="${#fields.hasErrors('categoriaDesercion')} ? 'field-error'" required>
                                     <option value="">-- Seleccione --</option>
                                     <option value="Riesgo Académico">Riesgo Académico</option>
                                     <option value="Riesgo Económico">Riesgo Económico</option>
@@ -147,7 +164,8 @@
                             </div>
                             <div class="form-group" style="flex:1;">
                                 <label style="font-weight: 700; color: #555;">Estado del Caso</label>
-                                <select th:field="*{estadoCaso}" class="form-control" required>
+                                <select th:field="*{estadoCaso}" class="form-control" 
+                                        th:classappend="${#fields.hasErrors('estadoCaso')} ? 'field-error'" required>
                                     <option value="Abierto">Abierto</option>
                                     <option value="En Seguimiento">En Seguimiento</option>
                                     <option value="Cerrado">Cerrado</option>
@@ -159,7 +177,8 @@
                         <div class="row" style="display:flex; gap:20px; margin-bottom: 15px;">
                             <div class="form-group" style="flex:1;">
                                 <label style="font-weight: 700; color: #555;">Remitido Por</label>
-                                <input type="text" th:field="*{remitidoPor}" class="form-control" required>
+                                <input type="text" th:field="*{remitidoPor}" class="form-control" 
+                                       th:classappend="${#fields.hasErrors('remitidoPor')} ? 'field-error'" required>
                                 <span th:if="${#fields.hasErrors('remitidoPor')}" th:errors="*{remitidoPor}" class="error-message"></span>
                             </div>
                             <div class="form-group" style="flex:1;">
@@ -167,7 +186,7 @@
                                 <input type="text" id="atencionFamiliar" th:field="*{atencionFamiliar}" 
                                        class="form-control" 
                                        placeholder="Parentesco"
-                                       style="color: #000000; font-weight: 800;">
+                                       style="color: #000; font-weight: 800;">
                             </div>
                         </div>
 
@@ -241,7 +260,6 @@
                 if (edadNum >= 18) {
                     inputFamiliar.disabled = true;
                     inputFamiliar.placeholder = "No aplica (Mayor de edad)";
-                    // Asegura que el fondo gris no oculte el texto de placeholder
                     inputFamiliar.style.backgroundColor = "#e9ecef";
                     inputFamiliar.style.cursor = "not-allowed";
                     inputFamiliar.style.fontWeight = "bold";

@@ -29,22 +29,25 @@
                     
                     <div class="form-group" style="margin-bottom: 20px;">
                         <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Código de Ficha</label>
-                        <input type="text" th:field="*{codigo}" class="form-control" placeholder="Solo números (Máx 12)">
+                        <input type="text" th:field="*{codigo}" class="form-control" placeholder="Solo números (Min 5 Máx 12)"
+                               minlength="5" maxlength="12"
+                               oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
                         <span th:if="${#fields.hasErrors('codigo')}" th:errors="*{codigo}" class="error-message"></span>
                     </div>
 
                     <div class="form-group" style="margin-bottom: 20px;">
                         <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Programa de Formación</label>
-                        <input type="text" th:field="*{programa}" class="form-control" placeholder="Ej: Análisis y Desarrollo de Software">
+                        <input type="text" th:field="*{programa}" class="form-control" placeholder="Ej: Análisis y Desarrollo de Software"
+                               minlength="5" maxlength="100"
+                               oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '')" required>
                         <span th:if="${#fields.hasErrors('programa')}" th:errors="*{programa}" class="error-message"></span>
                     </div>
 
                     <div class="form-group" style="margin-bottom: 20px;">
                         <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Jornada</label>
-                        <select th:field="*{jornada}" class="form-control">
+                        <select th:field="*{jornada}" class="form-control" required>
                             <option value="">-- Seleccione --</option>
                             <option value="Diurna">Diurna</option>
-                            <option value="Mixta">Mixta</option>
                             <option value="Nocturna">Nocturna</option>
                             <option value="Madrugada">Madrugada</option>
                             <option value="Fin de Semana">Fin de Semana</option>
@@ -54,7 +57,7 @@
 
                     <div class="form-group" style="margin-bottom: 20px;">
                         <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Modalidad</label>
-                        <select th:field="*{modalidad}" class="form-control">
+                        <select th:field="*{modalidad}" class="form-control" required>
                             <option value="">-- Seleccione --</option>
                             <option value="Presencial">Presencial</option>
                             <option value="Virtual">Virtual</option>
@@ -65,7 +68,7 @@
 
                     <div class="form-group" style="margin-bottom: 30px;">
                         <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Coordinación Académica</label>
-                        <select th:field="*{coordinacion}" class="form-control">
+                        <select th:field="*{coordinacion}" class="form-control" required>
                             <option value="">-- Seleccione Coordinación --</option>
                             <option th:each="c : ${coordinaciones}" 
                                     th:value="${c.id}" 
@@ -87,4 +90,4 @@
         </div>
     </div>
 </body>
-</html>
+</html> 

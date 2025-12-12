@@ -9,7 +9,6 @@ import java.util.Optional;
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findByEmail(String email);
     boolean existsByEmail(String email);
-    
-    // Método necesario para llenar el Select de profesionales
+
     List<Usuario> findByRolIn(Collection<String> roles);
 }

@@ -5,6 +5,7 @@ import com.sena.sistemaintegralsena.repository.InstructorRepository;
 import com.sena.sistemaintegralsena.service.InstructorService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -20,17 +21,18 @@ public class InstructorServiceImpl implements InstructorService {
     @Override
     @Transactional(readOnly = true)
     public List<Instructor> listarTodos() {
-        return repository.findAll();
+        
+        return repository.findAll(Sort.by(Sort.Direction.ASC, "id"));
     }
 
     @Override
     @Transactional
     public void guardar(Instructor instructor) {
+        
         if (instructor.getId() == null) {
             if (repository.existsByNumeroDocumento(instructor.getNumeroDocumento())) {
                 throw new RuntimeException("El documento " + instructor.getNumeroDocumento() + " ya está registrado.");
             }
-            // 🔑 VALIDACIÓN DE CORREO ÚNICO
             if (repository.existsByCorreo(instructor.getCorreo())) {
                 throw new RuntimeException("El correo " + instructor.getCorreo() + " ya está registrado.");
             }
@@ -44,10 +46,15 @@ public class InstructorServiceImpl implements InstructorService {
         return repository.findById(id).orElse(null);
     }
 
+    
     @Override
     @Transactional
-    public void eliminar(Long id) {
-        repository.deleteById(id);
+    public void cambiarEstado(Long id) {
+        Instructor instructor = repository.findById(id).orElse(null);
+        if (instructor != null) {
+            instructor.setActivo(!instructor.isActivo()); 
+            repository.save(instructor);
+        }
     }
 
     @Override

@@ -9,6 +9,7 @@
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
     
     <style>
+        /* Estructura de columnas para el formulario */
         .form-row { display: flex; gap: 20px; margin-bottom: 15px; }
         .form-col { flex: 1; }
         @media (max-width: 768px) { .form-row { flex-direction: column; gap: 0; } }
@@ -27,7 +28,7 @@
 
             <div class="form-container" style="max-width: 800px; margin: 0 auto;">
                 
-                <div th:if="${error}" style="background: #fee2e2; color: #991b1b; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: bold;">
+                <div th:if="${error}" style="background: #fee2e2; color: #991b1b; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: bold; border: 1px solid #fca5a5;">
                     <span th:text="${error}"></span>
                 </div>
 
@@ -36,12 +37,16 @@
                     <div class="form-row">
                         <div class="form-col">
                             <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Nombres</label>
-                            <input type="text" th:field="*{nombres}" class="form-control" placeholder="Ej: María José">
+                            <input type="text" th:field="*{nombres}" class="form-control" 
+                                   th:classappend="${#fields.hasErrors('nombres')} ? 'field-error'"
+                                   oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '')" required>
                             <span th:if="${#fields.hasErrors('nombres')}" th:errors="*{nombres}" class="error-message"></span>
                         </div>
                         <div class="form-col">
                             <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Apellidos</label>
-                            <input type="text" th:field="*{apellidos}" class="form-control" placeholder="Ej: Rodríguez">
+                            <input type="text" th:field="*{apellidos}" class="form-control" 
+                                   th:classappend="${#fields.hasErrors('apellidos')} ? 'field-error'"
+                                   oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '')" required>
                             <span th:if="${#fields.hasErrors('apellidos')}" th:errors="*{apellidos}" class="error-message"></span>
                         </div>
                     </div>
@@ -49,7 +54,8 @@
                     <div class="form-row">
                         <div class="form-col">
                             <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Tipo Documento</label>
-                            <select th:field="*{tipoDocumento}" class="form-control">
+                            <select th:field="*{tipoDocumento}" class="form-control" 
+                                    th:classappend="${#fields.hasErrors('tipoDocumento')} ? 'field-error'" required>
                                 <option value="">-- Seleccione --</option>
                                 <option value="CC">Cédula de Ciudadanía</option>
                                 <option value="TI">Tarjeta de Identidad</option>
@@ -60,20 +66,26 @@
                         </div>
                         <div class="form-col">
                             <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Número Documento</label>
-                            <input type="text" th:field="*{numeroDocumento}" class="form-control" placeholder="Sin puntos">
+                            <input type="text" th:field="*{numeroDocumento}" class="form-control" 
+                                   th:classappend="${#fields.hasErrors('numeroDocumento')} ? 'field-error'"
+                                   minlength="5" oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')" required>
                             <span th:if="${#fields.hasErrors('numeroDocumento')}" th:errors="*{numeroDocumento}" class="error-message"></span>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-col">
-                            <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Fecha de Nacimiento (+16 Años)</label>
-                            <input type="date" th:field="*{fechaNacimiento}" th:max="${maxDate}" class="form-control">
+                            <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Fecha de Nacimiento</label>
+                            <input type="date" th:field="*{fechaNacimiento}" 
+                                   th:classappend="${#fields.hasErrors('fechaNacimiento')} ? 'field-error'"
+                                   min="1945-01-01" th:max="${maxDate}" class="form-control" required>
                             <span th:if="${#fields.hasErrors('fechaNacimiento')}" th:errors="*{fechaNacimiento}" class="error-message"></span>
                         </div>
+                        
                         <div class="form-col">
                             <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Asignar a Ficha</label>
-                            <select th:field="*{ficha}" class="form-control">
+                            <select th:field="*{ficha}" class="form-control" 
+                                    th:classappend="${#fields.hasErrors('ficha')} ? 'field-error'" required>
                                 <option value="">-- Seleccione Ficha --</option>
                                 <option th:each="f : ${fichas}" 
                                         th:value="${f.id}" 
@@ -81,25 +93,34 @@
                                 </option>
                             </select>
                             <span th:if="${#fields.hasErrors('ficha')}" th:errors="*{ficha}" class="error-message"></span>
+                            
+                            <label class="vocero-switch" for="checkVocero">
+                                <input type="checkbox" th:field="*{esVocero}" id="checkVocero">
+                                <span>¿Es Vocero de esta Ficha?</span>
+                            </label>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-col">
                             <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Correo Electrónico</label>
-                            <input type="email" th:field="*{correo}" class="form-control" placeholder="aprendiz@soy.sena.edu.co">
+                            <input type="email" th:field="*{correo}" class="form-control" 
+                                   th:classappend="${#fields.hasErrors('correo')} ? 'field-error'" required>
                             <span th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}" class="error-message"></span>
                         </div>
                         <div class="form-col">
                             <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Celular</label>
-                            <input type="text" th:field="*{celular}" class="form-control">
+                            <input type="text" th:field="*{celular}" class="form-control" 
+                                   th:classappend="${#fields.hasErrors('celular')} ? 'field-error'"
+                                   maxlength="10" minlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
                             <span th:if="${#fields.hasErrors('celular')}" th:errors="*{celular}" class="error-message"></span>
                         </div>
                     </div>
 
                     <div class="form-group" style="margin-bottom: 30px;">
                         <label style="font-weight: 700; color: #555; margin-bottom: 5px; display:block;">Etapa de Formación</label>
-                        <select th:field="*{etapaFormacion}" class="form-control">
+                        <select th:field="*{etapaFormacion}" class="form-control" 
+                                th:classappend="${#fields.hasErrors('etapaFormacion')} ? 'field-error'" required>
                             <option value="">-- Seleccione --</option>
                             <option value="Lectiva">Lectiva</option>
                             <option value="Productiva">Productiva</option>
@@ -107,13 +128,10 @@
                         <span th:if="${#fields.hasErrors('etapaFormacion')}" th:errors="*{etapaFormacion}" class="error-message"></span>
                     </div>
 
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <button type="submit" class="btn-main btn-create" style="border: none; cursor: pointer; flex: 1; justify-content: center;">
-                            Guardar Aprendiz
-                        </button>
+                    <div style="display: flex; align-items: center; gap: 15px; margin-top: 30px;">
+                        <button type="submit" class="btn-main btn-create" style="width: 100%; justify-content: center;">Guardar Aprendiz</button>
                         <a th:href="@{/aprendices}" class="btn-cancel">Cancelar</a>
                     </div>
-
                 </form>
             </div>
         </div>

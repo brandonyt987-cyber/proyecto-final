@@ -2,10 +2,8 @@ package com.sena.sistemaintegralsena.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -18,17 +16,9 @@ public class Atencion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // --- RELACIONES ---
-    
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "aprendiz_id", nullable = false)
-    private Aprendiz aprendiz;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "usuario_id", nullable = false)
-    private Usuario profesional; 
-
-    // --- DATOS DEL CASO ---
+    // --- DATOS GENERALES DEL CASO ---
+    @NotBlank(message = "El estado del caso es obligatorio")
+    private String estadoCaso; // Abierto, Cerrado o  En Seguimiento
 
     @NotBlank(message = "La categoría es obligatoria")
     private String categoriaDesercion; 
@@ -38,30 +28,36 @@ public class Atencion {
 
     private String atencionFamiliar;
 
-    @NotBlank(message = "El estado del caso es obligatorio")
-    private String estadoCaso; 
+    private LocalDateTime fechaCreacionRegistro;
 
-    // --- SEGUIMIENTOS (Fechas y Observaciones) ---
-
+    // --- SEGUIMIENTOS ---
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate fechaConsulta1;
-    
     @Column(columnDefinition = "TEXT")
     private String observaciones1;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate fechaConsulta2;
-    
     @Column(columnDefinition = "TEXT")
     private String observaciones2;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate fechaConsulta3;
-    
     @Column(columnDefinition = "TEXT")
     private String observaciones3;
 
-    private LocalDateTime fechaCreacionRegistro;
+    // --- RELACIONES ---
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "aprendiz_id", nullable = false)
+    private Aprendiz aprendiz;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario profesional; 
+
+    
+    @Column(columnDefinition = "boolean default true")
+    private boolean activo = true;
 
     @PrePersist
     public void prePersist() {

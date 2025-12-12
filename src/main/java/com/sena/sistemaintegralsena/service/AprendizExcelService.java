@@ -49,7 +49,7 @@ public class AprendizExcelService {
             while (rows.hasNext()) {
                 Row currentRow = rows.next();
 
-                // Saltar cabecera
+                
                 if (rowNumber == 0) {
                     rowNumber++;
                     continue;
@@ -62,23 +62,23 @@ public class AprendizExcelService {
 
                 Aprendiz aprendiz = new Aprendiz();
 
-                // 0: Nombres
+                // Nombres
                 aprendiz.setNombres(getCellValue(currentRow, 0));
 
-                // 1: Apellidos
+                // Apellidos
                 aprendiz.setApellidos(getCellValue(currentRow, 1));
 
-                // 2: Tipo Doc
+                // Tipo Doc
                 aprendiz.setTipoDocumento(getCellValue(currentRow, 2));
 
-                // 3: Número Doc
+                // Número Doc
                 String numDoc = getCellValue(currentRow, 3)
                         .replace(".", "")
                         .replace(",", "")
                         .trim();
                 aprendiz.setNumeroDocumento(numDoc);
 
-                // 4: Fecha Nacimiento (string con formato yyyy-MM-dd)
+                // Fecha Nacimiento string con formato yyyy-MM-dd :D
                 String fechaTexto = getCellValue(currentRow, 4);
                 try {
                     aprendiz.setFechaNacimiento(LocalDate.parse(fechaTexto));
@@ -89,16 +89,16 @@ public class AprendizExcelService {
                     );
                 }
 
-                // 5: Correo
+                // Correo
                 aprendiz.setCorreo(getCellValue(currentRow, 5));
 
-                // 6: Celular
+                // Celular osea el bicho siuuu
                 aprendiz.setCelular(getCellValue(currentRow, 6));
 
-                // 7: Etapa formación
+                // Etapa formación
                 aprendiz.setEtapaFormacion(getCellValue(currentRow, 7));
 
-                // 8: Código Ficha
+                // Código Ficha
                 String codigoFicha = getCellValue(currentRow, 8);
                 Ficha ficha = fichaRepository.findByCodigo(codigoFicha);
 
@@ -123,7 +123,7 @@ public class AprendizExcelService {
         }
     }
 
-    // 🔥 Método universal — evita TODOS los errores de tipos de celda
+    
     private String getCellValue(Row row, int cellIndex) {
         Cell cell = row.getCell(cellIndex);
         if (cell == null) return "";

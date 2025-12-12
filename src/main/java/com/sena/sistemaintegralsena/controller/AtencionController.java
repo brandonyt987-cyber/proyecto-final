@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
-import java.util.Comparator; // ✅ IMPORTANTE: Agregado para ordenar
+import java.util.Comparator; 
 import java.util.List;
 
 @Controller
@@ -28,23 +28,13 @@ public class AtencionController {
     @Autowired private AprendizRepository aprendizRepository;
     @Autowired private UsuarioRepository usuarioRepository;
 
-    // ===============================================================
-    // LISTAR (MODIFICADO PARA ORDEN ASCENDENTE)
-    // ===============================================================
     @GetMapping
     public String listar(Model model) {
-        // 1. Obtener la lista
         List<Atencion> listaAtenciones = atencionService.listarTodas();
-        
-        // 2. Ordenar por ID de menor a mayor (ASC)
-        listaAtenciones.sort(Comparator.comparing(Atencion::getId));
-        
-        // 3. Enviar a la vista
         model.addAttribute("atenciones", listaAtenciones);
         return "atencion/lista";
     }
 
-    // MÉTODO AUXILIAR
     private void configurarVista(Model model) {
         List<String> roles = List.of("PSICOLOGA", "T_SOCIAL");
         List<Usuario> profesionales = usuarioRepository.findByRolIn(roles);
@@ -58,19 +48,21 @@ public class AtencionController {
         configurarVista(model);
     }
 
-    // CREAR
     @GetMapping("/crear")
     public String buscarParaCrear(@RequestParam(required = false) String documento, Model model) {
         if (!model.containsAttribute("atencion")) {
-            // Inicializamos con un Usuario vacío para que el path 'profesional.id' no falle en el HTML
             Atencion atencion = new Atencion();
             atencion.setProfesional(new Usuario()); 
             model.addAttribute("atencion", atencion);
         }
-        
         configurarVista(model);
 
-        if (documento != null && !documento.isEmpty()) {
+        if (documento != null && documento.trim().isEmpty()) {
+            model.addAttribute("errorBusqueda", "Por favor, ingrese un número de documento.");
+            return "atencion/crear";
+        }
+
+        if (documento != null) { 
             Aprendiz aprendiz = aprendizRepository.findByNumeroDocumento(documento);
             if (aprendiz != null) {
                 model.addAttribute("aprendizEncontrado", aprendiz);
@@ -82,7 +74,6 @@ public class AtencionController {
         return "atencion/crear";
     }
 
-    // GUARDAR
     @PostMapping("/guardar")
     public String guardar(@Valid @ModelAttribute Atencion atencion, 
                           BindingResult result, 
@@ -90,13 +81,10 @@ public class AtencionController {
                           RedirectAttributes redirect, 
                           Model model) {
         
-        // 1. VALIDACIÓN MANUAL DEL PROFESIONAL
-        // Validamos directamente el ID. Si es nulo, inyectamos el error en el campo específico.
         if (atencion.getProfesional() == null || atencion.getProfesional().getId() == null) {
             result.rejectValue("profesional.id", "error.profesional", "Debe seleccionar un profesional.");
         }
 
-        // 2. Si hay errores (incluido el del profesional), volvemos al formulario
         if (result.hasErrors()) {
             recargarDatos(model, aprendizId);
             return "atencion/crear";
@@ -113,7 +101,6 @@ public class AtencionController {
         return "redirect:/atencion";
     }
 
-    // EDITAR
     @GetMapping("/editar/{id}")
     public String formEditar(@PathVariable Long id, Model model) {
         Atencion atencion = atencionService.buscarPorId(id);
@@ -125,7 +112,6 @@ public class AtencionController {
         return "atencion/editar";
     }
 
-    // ACTUALIZAR
     @PostMapping("/actualizar")
     public String actualizar(@Valid @ModelAttribute Atencion atencion, 
                              BindingResult result, 
@@ -153,11 +139,11 @@ public class AtencionController {
         return "redirect:/atencion";
     }
 
-    // ELIMINAR
-    @GetMapping("/eliminar/{id}")
-    public String eliminar(@PathVariable Long id, RedirectAttributes redirect) {
-        atencionService.eliminar(id);
-        redirect.addFlashAttribute("exito", "Registro eliminado.");
+    
+    @GetMapping("/cambiar-estado/{id}")
+    public String cambiarEstado(@PathVariable Long id, RedirectAttributes redirect) {
+        atencionService.cambiarEstado(id);
+        redirect.addFlashAttribute("exito", "Estado del registro actualizado.");
         return "redirect:/atencion";
     }
 }

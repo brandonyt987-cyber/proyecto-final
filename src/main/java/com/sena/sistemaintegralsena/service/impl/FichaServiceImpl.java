@@ -3,7 +3,7 @@ package com.sena.sistemaintegralsena.service.impl;
 import com.sena.sistemaintegralsena.entity.Ficha;
 import com.sena.sistemaintegralsena.repository.FichaRepository;
 import com.sena.sistemaintegralsena.service.FichaService;
-import org.springframework.data.domain.Sort; // <--- 1. IMPORTACIÓN NUEVA
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +21,7 @@ public class FichaServiceImpl implements FichaService {
 
     @Override
     public List<Ficha> listarTodas() {
-        // 2. AJUSTE: Ordenar por ID de forma Ascendente
+        
         return fichaRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
     }
 
@@ -46,9 +46,14 @@ public class FichaServiceImpl implements FichaService {
         return fichaRepository.findById(id).orElse(null);
     }
 
+    // NUEVA LÓGICA DE ESTADO
     @Override
-    public void eliminar(Long id) {
-        fichaRepository.deleteById(id);
+    public void cambiarEstado(Long id) {
+        Ficha ficha = fichaRepository.findById(id).orElse(null);
+        if (ficha != null) {
+            ficha.setActivo(!ficha.isActivo()); 
+            fichaRepository.save(ficha);
+        }
     }
 
     @Override

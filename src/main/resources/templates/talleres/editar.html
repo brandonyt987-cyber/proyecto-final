@@ -12,9 +12,8 @@
         .form-row { display: flex; gap: 20px; margin-bottom: 15px; }
         .form-col { flex: 1; }
         @media (max-width: 768px) { .form-row { flex-direction: column; gap: 0; } }
-
-        /* Mantenemos el error message aquí para que sea simple */
         .error-message { color: #dc3545; font-size: 0.85rem; display: block; margin-top: 5px; font-weight: bold; }
+        .field-error { border-color: #dc3545 !important; background-color: #fff8f8 !important; }
     </style>
 </head>
 <body>
@@ -34,10 +33,12 @@
                 <form method="POST" th:action="@{/talleres/actualizar}" th:object="${taller}" novalidate>
                     
                     <input type="hidden" th:field="*{id}">
+                    <input type="hidden" th:field="*{activo}">
 
                     <div class="form-group" style="margin-bottom: 20px;">
                         <label style="font-weight: 700; color: #555;">Nombre del Taller</label>
-                        <input type="text" th:field="*{nombreTaller}" class="form-control" required>
+                        <input type="text" th:field="*{nombreTaller}" class="form-control" 
+                               th:classappend="${#fields.hasErrors('nombreTaller')} ? 'field-error'" required>
                         <span th:if="${#fields.hasErrors('nombreTaller')}" th:errors="*{nombreTaller}" class="error-message"></span>
                     </div>
 
@@ -69,12 +70,14 @@
                     <div class="form-row">
                         <div class="form-col" style="flex: 3;">
                             <label style="font-weight: 700; color: #555;">Fecha</label>
-                            <input type="date" th:field="*{fecha}" class="form-control" th:min="${minDate}" required>
+                            <input type="date" th:field="*{fecha}" class="form-control" th:min="${minDate}" 
+                                   th:classappend="${#fields.hasErrors('fecha')} ? 'field-error'" required>
                             <span th:if="${#fields.hasErrors('fecha')}" th:errors="*{fecha}" class="error-message"></span>
                         </div>
                         <div class="form-col" style="flex: 1;">
                             <label style="font-weight: 700; color: #555;">Cupo Solicitado</label>
-                            <input type="number" th:field="*{cupo}" class="form-control" min="1" required>
+                            <input type="number" th:field="*{cupo}" class="form-control" min="1" 
+                                   th:classappend="${#fields.hasErrors('cupo')} ? 'field-error'" required>
                             <span th:if="${#fields.hasErrors('cupo')}" th:errors="*{cupo}" class="error-message"></span>
                         </div>
                     </div>
@@ -93,11 +96,9 @@
                     </div>
 
                     <div style="margin-top:30px; display:flex; justify-content:center; gap:15px;">
-                        
                         <button type="submit" class="btn-main btn-edit" style="cursor:pointer; width:100%; max-width:300px; justify-content:center;">
                             Actualizar Taller
                         </button>
-
                         <a th:href="@{/talleres}" class="btn-cancel" style="width:100%; max-width:300px;">
                             Cancelar
                         </a>

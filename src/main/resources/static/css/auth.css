@@ -12,18 +12,18 @@ body {
     overflow: hidden;
 }
 
-/* --- COLUMNA IZQUIERDA (DECORATIVA - ESTILO NEXUS) --- */
+/* --- COLUMNA IZQUIERDA ESTILO NEXUS) --- */
 .auth-sidebar {
     width: 40%;
     height: 100%;
 
-    /* 🎨 Degradado ultra vivo con predominancia morada arriba */
+    /* Degradado ultra vivo con predominancia morada arriba 100% real no fake*/
     background: linear-gradient(
         135deg,
-        #8A00FF 0%,    /* Morado eléctrico dominante */
-        #7A00F5 25%,   /* Morado brillante */
-        #005CFF 55%,   /* Azul eléctrico */
-        #00EFFF 100%   /* Cian neón */
+        #8A00FF 0%,    
+        #7A00F5 25%,   
+        #005CFF 55%,   
+        #00EFFF 100%   
     );
 
     position: relative;
@@ -163,12 +163,12 @@ body {
     box-shadow: 0 0 0 4px rgba(122, 0, 245, 0.20);
 }
 
-/* 🔥 BOTÓN — Verde neón intenso y vivo */
+/* BOTÓN — Verde neón intenso y vivo jsjs*/
 .btn-auth {
     width: 100%;
     padding: 13px;
 
-    /* Verde ultra brillante */
+    /* Verde ultra brillante chingame la vista*/
     background: linear-gradient(90deg, #06bf2e 0%, #00E62B 100%);
     color: white;
     border: none;
@@ -234,15 +234,15 @@ body {
     color: #d9534f;
     margin-top: 6px;
     margin-left: 12px;
-    height: auto; /* CORREGIDO: antes era 16px fijo */
+    height: auto; 
 }
 
-/* --- Ajuste para evitar overlaping y mantener los errores limpios --- */
+/* --- Ajuste para evitar overlaping y mantener los errores limpios, osea que no se encime todo UwU--- */
 .field-error {
     display: block;
-    height: auto;          /* AÑADIDO: permite que crezca según el texto */
-    min-height: 18px;      /* Espacio reservado mínimo */
-    line-height: 1.4;      /* CORREGIDO: mejor lectura en varias líneas */
+    height: auto;          
+    min-height: 18px;      
+    line-height: 1.4;      
     color: #d9534f;
     font-size: 0.85rem;
     margin-left: 12px;
@@ -251,5 +251,5 @@ body {
 
 /* Más espacio vertical entre los campos (A + B) */
 .form-group {
-    margin-bottom: 22px;   /* Antes era 15 → suficiente para evitar choques */
+    margin-bottom: 22px; 
 }

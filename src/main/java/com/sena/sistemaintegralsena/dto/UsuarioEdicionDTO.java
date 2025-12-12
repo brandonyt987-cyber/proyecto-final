@@ -22,9 +22,9 @@ public class UsuarioEdicionDTO {
     @Email(message = "Debe ser una dirección de correo válida.")
     private String email;
 
-    // 🔑 AJUSTE: Regex que permite VACÍO (^$) O una contraseña segura
+    // Contraseña opcional en edición
     @Pattern(regexp = "^$|^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$", 
-             message = "Si cambia la contraseña, debe tener mín 8 caracteres, 1 Mayús, 1 Minús, 1 Núm y 1 Especial.")
+             message = "Si cambia la contraseña, debe cumplir con los requisitos de seguridad.")
     private String password;
 
     @NotNull(message = "Debe seleccionar un rol.")

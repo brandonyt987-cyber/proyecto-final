@@ -63,7 +63,6 @@ public class TallerController {
             redirect.addFlashAttribute("exito", "Taller programado correctamente.");
         } catch (Exception e) {
             cargarDatosFormulario(model);
-            // Mapeo de errores específicos
             String msg = e.getMessage().toLowerCase();
             if (msg.contains("inicio")) {
                 result.rejectValue("horaInicio", "error.hora", e.getMessage());
@@ -111,14 +110,11 @@ public class TallerController {
         return "redirect:/talleres";
     }
 
-    @GetMapping("/eliminar/{id}")
-    public String eliminar(@PathVariable Long id, RedirectAttributes redirect) {
-        try {
-            tallerService.eliminar(id);
-            redirect.addFlashAttribute("exito", "Taller eliminado.");
-        } catch (Exception e) {
-            redirect.addFlashAttribute("error", "No se puede eliminar el taller.");
-        }
+    
+    @GetMapping("/cambiar-estado/{id}")
+    public String cambiarEstado(@PathVariable Long id, RedirectAttributes redirect) {
+        tallerService.cambiarEstado(id);
+        redirect.addFlashAttribute("exito", "Estado del taller actualizado.");
         return "redirect:/talleres";
     }
 }

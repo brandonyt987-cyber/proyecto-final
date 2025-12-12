@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -31,7 +32,7 @@ public class AtencionServiceImpl implements AtencionService {
 
     @Override
     public List<Atencion> listarTodas() {
-        return atencionRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+        return atencionRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
     }
 
     @Override
@@ -42,26 +43,43 @@ public class AtencionServiceImpl implements AtencionService {
     @Override
     public void guardar(Atencion atencion, Long aprendizId, String emailProfesional) {
         
-        // 1. ASOCIAR APRENDIZ
+        // --- 1. LÓGICA DE BLINDAJE DE FECHA (AQUÍ ESTABA EL ERROR) ---
+        if (atencion.getId() != null) {
+            
+            Atencion original = atencionRepository.findById(atencion.getId()).orElse(null);
+            
+            if (original != null) {
+                
+                atencion.setFechaCreacionRegistro(original.getFechaCreacionRegistro());
+                
+                
+                if (atencion.getFechaCreacionRegistro() == null) {
+                    atencion.setFechaCreacionRegistro(LocalDateTime.now());
+                }
+            }
+        } else {
+            
+            if (atencion.getFechaCreacionRegistro() == null) {
+                atencion.setFechaCreacionRegistro(LocalDateTime.now());
+            }
+        }
+
+        // --- 2. ASOCIAR APRENDIZ ---
         Aprendiz aprendiz = aprendizRepository.findById(aprendizId)
                 .orElseThrow(() -> new RuntimeException("Aprendiz no encontrado"));
         atencion.setAprendiz(aprendiz);
 
-        // 2. ASOCIAR PROFESIONAL (CORRECCIÓN AQUÍ 👇)
-        
-        // Caso A: Viene del SELECT en el formulario (Tiene ID)
+        // --- 3. ASOCIAR PROFESIONAL ---
         if (atencion.getProfesional() != null && atencion.getProfesional().getId() != null) {
             Usuario profesional = usuarioRepository.findById(atencion.getProfesional().getId())
-                    .orElseThrow(() -> new RuntimeException("El profesional seleccionado no existe en la base de datos."));
+                    .orElseThrow(() -> new RuntimeException("El profesional seleccionado no existe."));
             atencion.setProfesional(profesional);
         } 
-        // Caso B: No viene del formulario, usamos el email del usuario logueado (Respaldo)
         else if (emailProfesional != null) {
             Usuario profesional = usuarioRepository.findByEmail(emailProfesional)
                     .orElseThrow(() -> new RuntimeException("Profesional no encontrado por email."));
             atencion.setProfesional(profesional);
         } 
-        // Caso C: Error, no hay profesional
         else {
             throw new RuntimeException("Debe seleccionar un profesional a cargo.");
         }
@@ -76,7 +94,11 @@ public class AtencionServiceImpl implements AtencionService {
     }
 
     @Override
-    public void eliminar(Long id) {
-        atencionRepository.deleteById(id);
+    public void cambiarEstado(Long id) {
+        Atencion atencion = atencionRepository.findById(id).orElse(null);
+        if (atencion != null) {
+            atencion.setActivo(!atencion.isActivo());
+            atencionRepository.save(atencion);
+        }
     }
 }

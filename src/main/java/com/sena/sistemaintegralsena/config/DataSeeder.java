@@ -39,32 +39,51 @@ public class DataSeeder {
     public void seedData() {
 
         // ============================
-        // 1. CREACIÓN DE ROLES (CRÍTICO para evitar el error 500)
+        // 1. CREACIÓN DE ROLES (CRÍTICO)
         // ============================
-        // Crea las filas en la tabla 'rol' antes de que los usuarios las referencien.
         Rol rolAdmin = findOrCreateRol("ADMIN");
-        findOrCreateRol("PSICOLOGA");
-        findOrCreateRol("T_SOCIAL");
+        Rol rolPsico = findOrCreateRol("PSICOLOGA");
+        Rol rolSocial = findOrCreateRol("T_SOCIAL");
 
 
         // ============================
-        // 2. CREACIÓN DE USUARIOS ADMINISTRADORES (Dos usuarios)
+        // 2. CREACIÓN DE USUARIOS INICIALES
         // ============================
 
-        // --- Administrador 1 ---
-        if (!usuarioRepository.existsByEmail("admin1@sena.edu.co")) {
-
-            Usuario admin1 = new Usuario();
-            admin1.setNombre("Administrador Principal");
-            admin1.setEmail("admin1@sena.edu.co");
-            admin1.setPassword(passwordEncoder.encode("Nala123*"));
-            admin1.setEnabled(true);
-
-            // Asignamos el nombre del rol simple (ADMIN)
-            admin1.setRol(rolAdmin.getNombre()); 
-
-            usuarioRepository.save(admin1);
+        // --- Administrador unico ---
+        if (!usuarioRepository.existsByEmail("v64149378@gmail.com")) {
+            Usuario admin = new Usuario();
+            admin.setNombre("Administrador Principal");
+            admin.setEmail("v64149378@gmail.com");
+            admin.setPassword(passwordEncoder.encode("Nala123*"));
+            admin.setEnabled(true);
+            admin.setRol(rolAdmin.getNombre()); 
+            usuarioRepository.save(admin);
+            System.out.println(">> Usuario ADMIN creado: v64149378@gmail.com");
         }
-           
+        
+        // --- Pisicologa ---
+        if (!usuarioRepository.existsByEmail("psico@sena.edu.co")) {
+            Usuario psico = new Usuario();
+            psico.setNombre("Laura Gómez");
+            psico.setEmail("psico@sena.edu.co");
+            psico.setPassword(passwordEncoder.encode("Nala123*"));
+            psico.setEnabled(true);
+            psico.setRol(rolPsico.getNombre());
+            usuarioRepository.save(psico);
+            System.out.println(">> Usuario PSICOLOGA creado: psico@sena.edu.co");
+        }
+
+        // --- Trabajadora Social ---
+        if (!usuarioRepository.existsByEmail("social@sena.edu.co")) {
+            Usuario social = new Usuario();
+            social.setNombre("María Torres");
+            social.setEmail("social@sena.edu.co");
+            social.setPassword(passwordEncoder.encode("Nala123*"));
+            social.setEnabled(true);
+            social.setRol(rolSocial.getNombre());
+            usuarioRepository.save(social);
+            System.out.println(">> Usuario T_SOCIAL creado: social@sena.edu.co");
+        }
     }
 }

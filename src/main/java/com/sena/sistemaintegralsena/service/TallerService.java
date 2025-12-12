@@ -7,5 +7,6 @@ public interface TallerService {
     List<Taller> listarTodos();
     void guardar(Taller taller);
     Taller buscarPorId(Long id);
-    void eliminar(Long id);
+
+    void cambiarEstado(Long id);
 }

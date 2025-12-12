@@ -6,9 +6,7 @@ import java.util.List;
 
 public interface TallerRepository extends JpaRepository<Taller, Long> {
     
-    // Ver talleres asignados a un profesional
     List<Taller> findByProfesionalId(Long usuarioId);
-
-    // Ver talleres de una ficha específica
     List<Taller> findByFichaId(Long fichaId);
+    List<Taller> findByActivoTrue();
 }

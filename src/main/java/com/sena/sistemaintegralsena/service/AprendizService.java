@@ -11,7 +11,8 @@ public interface AprendizService {
     
     Aprendiz buscarPorId(Long id);
     
-    void eliminar(Long id);
+    
+    void cambiarEstado(Long id);
     
     List<Aprendiz> buscarPorFicha(Long fichaId);
     

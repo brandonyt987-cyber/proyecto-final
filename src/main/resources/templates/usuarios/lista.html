@@ -4,56 +4,34 @@
     <title>Usuarios | SENA</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <link rel="icon" type="image/png" th:href="@{/img/logo-sena.png}">
-
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
-
     <style>
-        .header-tools {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .search-input {
-            padding: 10px 20px;
-            border-radius: 50px;
-            border: 1px solid #ccc;
-            outline: none;
-            font-size: 0.9rem;
-            width: 250px;
-            transition: all 0.3s;
-        }
-        .search-input:focus {
-            border-color: #6A11CB;
-            box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1);
-        }
+        .header-tools { display: flex; align-items: center; gap: 15px; }
+        .search-input { padding: 10px 20px; border-radius: 50px; border: 1px solid #ccc; outline: none; font-size: 0.9rem; width: 250px; transition: all 0.3s; }
+        .search-input:focus { border-color: #6A11CB; box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1); }
+        .estado-activo { color: #2ecc71; font-weight: bold; background: rgba(46, 204, 113, 0.1); padding: 5px 10px; border-radius: 15px; font-size: 0.85em; }
+        .estado-inactivo { color: #e74c3c; font-weight: bold; background: rgba(231, 76, 60, 0.1); padding: 5px 10px; border-radius: 15px; font-size: 0.85em; }
     </style>
 </head>
 <body>
-    
     <div th:replace="~{dashboard :: sidebar}"></div>
-    
     <div class="main-content">
-        
         <header th:replace="~{dashboard :: header-top}"></header>
-
         <div class="dashboard-area">
-            
             <div class="actions-header">
                 <h3>Gestión de Usuarios</h3>
-                
                 <div class="header-tools">
                     <input type="text" id="searchInput" class="search-input" onkeyup="filtrarTabla()" placeholder="Buscar usuario...">
-                    
-                    <a th:href="@{/usuarios/crear}" class="btn-main btn-create">
-                        + Nuevo Usuario
-                    </a>
+                    <a th:href="@{/usuarios/crear}" class="btn-main btn-create">+ Nuevo Usuario</a>
                 </div>
             </div>
 
-            <div th:if="${exito}" class="alert-success" style="margin-bottom: 20px; text-align: center; color: green; font-weight: bold;">
+            <div th:if="${exito}" style="margin-bottom: 20px; text-align: center; color: green; font-weight: bold;">
                 <span th:text="${exito}"></span>
+            </div>
+            <div th:if="${error}" style="margin-bottom: 20px; text-align: center; color: red; font-weight: bold;">
+                <span th:text="${error}"></span>
             </div>
 
             <div class="table-container">
@@ -64,6 +42,7 @@
                             <th>Nombre</th>
                             <th>Email</th>
                             <th class="center">Rol</th>
+                            <th class="center">Estado</th>
                             <th class="center">Acciones</th>
                         </tr>
                     </thead>
@@ -72,69 +51,47 @@
                             <td style="text-align: center; font-weight: bold;" th:text="${u.id}"></td>
                             <td th:text="${u.nombre}"></td>
                             <td th:text="${u.email}"></td>
+                            <td class="center"><span class="badge-info" th:text="${u.rol}"></span></td>
                             
                             <td class="center">
-                                <span class="badge-info" th:text="${u.rol}"></span>
+                                <span th:if="${u.enabled}" class="estado-activo">Activo</span>
+                                <span th:unless="${u.enabled}" class="estado-inactivo">Inactivo</span>
                             </td>
                             
                             <td class="center">
                                 <div class="action-buttons">
-                                    <a th:href="@{/usuarios/editar/{id}(id=${u.id})}" class="btn-table-action btn-edit">
-                                        Editar
-                                    </a>
-                                    <a th:href="@{/usuarios/eliminar/{id}(id=${u.id})}" 
-                                       onclick="return confirm('¿Seguro que desea eliminar este usuario?')" 
-                                       class="btn-table-action btn-delete">
-                                        Eliminar
+                                    <a th:href="@{/usuarios/editar/{id}(id=${u.id})}" class="btn-table-action btn-edit">Editar</a>
+                                    
+                                    <a th:href="@{/usuarios/cambiar-estado/{id}(id=${u.id})}" 
+                                       class="btn-table-action"
+                                       th:classappend="${u.enabled} ? 'btn-delete' : 'btn-create'"
+                                       th:text="${u.enabled} ? 'Inactivar' : 'Activar'">
                                     </a>
                                 </div>
                             </td>
                         </tr>
-                        <tr id="noResults" style="display:none;">
-                            <td colspan="5" style="text-align:center; padding: 20px; color: #666;">No se encontraron resultados.</td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
-
         </div>
     </div>
-
     <script>
         function filtrarTabla() {
-            var input, filter, table, tr, td, i, j, visible;
-            input = document.getElementById("searchInput");
-            filter = input.value.toUpperCase();
-            table = document.getElementById("tablaDatos");
-            tr = table.getElementsByTagName("tr");
-            var noResults = document.getElementById("noResults");
-            var hayResultados = false;
-
-            for (i = 1; i < tr.length; i++) {
-                if (tr[i].id === "noResults") continue;
-                visible = false;
-                td = tr[i].getElementsByTagName("td");
-                for (j = 0; j < td.length; j++) {
+            var input = document.getElementById("searchInput");
+            var filter = input.value.toUpperCase();
+            var table = document.getElementById("tablaDatos");
+            var tr = table.getElementsByTagName("tr");
+            for (var i = 1; i < tr.length; i++) {
+                var visible = false;
+                var td = tr[i].getElementsByTagName("td");
+                for (var j = 0; j < td.length; j++) {
                     if (td[j] && td[j].textContent.toUpperCase().indexOf(filter) > -1) {
-                        visible = true;
-                        break;
+                        visible = true; break;
                     }
                 }
-                if (visible) {
-                    tr[i].style.display = "";
-                    hayResultados = true;
-                } else {
-                    tr[i].style.display = "none";
-                }
-            }
-            
-            if (!hayResultados && filter !== "") {
-                noResults.style.display = "table-row";
-            } else {
-                noResults.style.display = "none";
+                if (visible) tr[i].style.display = ""; else tr[i].style.display = "none";
             }
         }
     </script>
-
 </body>
 </html>

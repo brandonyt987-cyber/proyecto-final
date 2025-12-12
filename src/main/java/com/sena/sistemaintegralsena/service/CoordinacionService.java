@@ -7,6 +7,6 @@ public interface CoordinacionService {
     List<Coordinacion> listarTodas();
     void guardar(Coordinacion coordinacion);
     Coordinacion buscarPorId(Long id);
-    void eliminar(Long id);
+    void cambiarEstado(Long id); 
     long totalCoordinaciones();
 }

@@ -5,7 +5,7 @@ import com.sena.sistemaintegralsena.service.CoordinacionService;
 import com.sena.sistemaintegralsena.service.FichaService;
 import com.sena.sistemaintegralsena.service.UsuarioService;
 import com.sena.sistemaintegralsena.service.InstructorService;
-import com.sena.sistemaintegralsena.service.VoceroService; // 👈 NUEVO IMPORT AGREGADO
+
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,20 +20,19 @@ public class DashboardController {
     private final AprendizService aprendizService;
     private final CoordinacionService coordinacionService;
     private final InstructorService instructorService;
-    private final VoceroService voceroService; 
+    
 
     public DashboardController(UsuarioService usuarioService, 
                                FichaService fichaService,
                                AprendizService aprendizService,
                                CoordinacionService coordinacionService,
-                               InstructorService instructorService,
-                               VoceroService voceroService) {
+                               InstructorService instructorService) {
         this.usuarioService = usuarioService;
         this.fichaService = fichaService;
         this.aprendizService = aprendizService;
         this.coordinacionService = coordinacionService;
         this.instructorService = instructorService; 
-        this.voceroService = voceroService; 
+        
     }
 
     @GetMapping("/dashboard")
@@ -52,7 +51,7 @@ public class DashboardController {
         model.addAttribute("totalAprendices", aprendizService.totalAprendices());
         model.addAttribute("totalCoordinaciones", coordinacionService.totalCoordinaciones());
         model.addAttribute("totalInstructores", instructorService.totalInstructores()); 
-        model.addAttribute("totalVoceros", voceroService.totalVoceros());
+        
 
         return "dashboard";
     }
